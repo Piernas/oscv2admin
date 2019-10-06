@@ -89,7 +89,7 @@
 ////
 // The HTML image wrapper function
   function tep_image($src, $alt = '', $width = '', $height = '', $parameters = '') {
-    $image = '<img src="' . tep_output_string($src) . '" border="0" alt="' . tep_output_string($alt) . '"';
+    $image = '<img class="img-fluid" src="' . tep_output_string($src) . '" border="0" alt="' . tep_output_string($alt) . '"';
 
     if (tep_not_null($alt)) {
       $image .= ' title="' . tep_output_string($alt) . '"';
@@ -106,30 +106,6 @@
     return $image;
   }
 
-////
-// The HTML form submit button wrapper function
-// Outputs a button in the selected language
-  function tep_image_submit($image, $alt = '', $parameters = '') {
-    global $language;
-
-    $image_submit = '<input type="image" src="' . tep_output_string('includes/languages/' . $language . '/images/buttons/' . $image) . '" border="0" alt="' . tep_output_string($alt) . '"';
-
-    if (tep_not_null($alt)) $image_submit .= ' title=" ' . tep_output_string($alt) . ' "';
-
-    if (tep_not_null($parameters)) $image_submit .= ' ' . $parameters;
-
-    $image_submit .= ' />';
-
-    return $image_submit;
-  }
-
-////
-// Draw a 1 pixel black line
-  function tep_black_line() {
-    return tep_image('images/pixel_black.gif', '', '100%', '1');
-  }
-
-////
 // Output a separator either through whitespace, or with an image
   function tep_draw_separator($image = 'pixel_black.gif', $width = '100%', $height = '1') {
     return tep_image('images/' . $image, '', $width, $height);
@@ -194,7 +170,7 @@
 
 ////
 // Output a form input field
-  function tep_draw_input_field($name, $value = '', $parameters = '', $required = false, $type = 'text', $reinsert_value = true) {
+  function tep_draw_input_field($name, $value = '', $parameters = '', $type = 'text', $reinsert_value = true, $class = 'class="form-control form-control-sm"') {
     $field = '<input type="' . tep_output_string($type) . '" name="' . tep_output_string($name) . '"';
 
     if ( ($reinsert_value == true) && ( (isset($_GET[$name]) && is_string($_GET[$name])) || (isset($_POST[$name]) && is_string($_POST[$name])) ) ) {
@@ -211,9 +187,9 @@
 
     if (tep_not_null($parameters)) $field .= ' ' . $parameters;
 
-    $field .= ' />';
+    if (tep_not_null($class)) $field .= ' ' . $class;
 
-    if ($required == true) $field .= TEXT_FIELD_REQUIRED;
+    $field .= ' />';
 
     return $field;
   }
@@ -266,7 +242,7 @@
 // Output a form textarea field
 // The $wrap parameter is no longer used in the core xhtml template
   function tep_draw_textarea_field($name, $wrap, $width, $height, $text = '', $parameters = '', $reinsert_value = true) {
-    $field = '<textarea name="' . tep_output_string($name) . '" cols="' . tep_output_string($width) . '" rows="' . tep_output_string($height) . '"';
+    $field = '<div class="form-group"><textarea class="form-control" name="' . tep_output_string($name) . '" cols="' . tep_output_string($width) . '" rows="' . tep_output_string($height) . '"';
 
     if (tep_not_null($parameters)) $field .= ' ' . $parameters;
 
@@ -282,7 +258,7 @@
       $field .= tep_output_string_protected($text);
     }
 
-    $field .= '</textarea>';
+    $field .= '</textarea></div>';
 
     return $field;
   }
@@ -328,7 +304,8 @@
 
     if (tep_not_null($parameters)) $field .= ' ' . $parameters;
 
-    $field .= '>';
+    (strpos($parameters , "class") !== false ) ?: $field .= ' class="form-control form-control-sm">';
+
 
     if (empty($default) && ( (isset($_GET[$name]) && is_string($_GET[$name])) || (isset($_POST[$name]) && is_string($_POST[$name])) ) ) {
       if (isset($_GET[$name]) && is_string($_GET[$name])) {
@@ -354,13 +331,13 @@
   }
 
 ////
-// Output a jQuery UI Button
-  function tep_draw_button($title = null, $icon = null, $link = null, $priority = null, $params = null) {
+// Output a Bootstrap Button
+  function tep_draw_button($title = null, $icon = null, $link = null, $priority = null, $params = array(), $style = null) {
     static $button_counter = 1;
 
     $types = array('submit', 'button', 'reset');
 
-    if ( !isset($params['type']) ) {
+    if (!isset($params['type']) || ($params['type']) == "" ) {
       $params['type'] = 'submit';
     }
 
@@ -371,28 +348,40 @@
     if ( ($params['type'] == 'submit') && isset($link) ) {
       $params['type'] = 'button';
     }
-
+/*
+removed (unused property from jquery UI)
     if (!isset($priority)) {
       $priority = 'secondary';
     }
-
-    $button = '<span class="tdbLink">';
+*/
+    $button = NULL;
 
     if ( ($params['type'] == 'button') && isset($link) ) {
-      $button .= '<a id="tdb' . $button_counter . '" href="' . $link . '"';
+      $button .= '<a id="btn' . $button_counter . '" href="' . $link . '"';
 
       if ( isset($params['newwindow']) ) {
         $button .= ' target="_blank"';
       }
     } else {
-      $button .= '<button id="tdb' . $button_counter . '" type="' . tep_output_string($params['type']) . '"';
+      $button .= '<button ';
+      $button .= ' type="' . tep_output_string($params['type']) . '"';
     }
 
     if ( isset($params['params']) ) {
       $button .= ' ' . $params['params'];
     }
 
-    $button .= '>' . $title;
+    $button .= ' class="btn ';
+
+    $button .= (isset($style)) ? $style : 'btn-outline-primary';
+
+    $button .= '">';
+
+    if (isset($icon) && tep_not_null($icon)) {
+      $button .= ' <span class="' . $icon . '"></span> ';
+    }
+
+    $button .= $title;
 
     if ( ($params['type'] == 'button') && isset($link) ) {
       $button .= '</a>';
@@ -400,34 +389,15 @@
       $button .= '</button>';
     }
 
-    $button .= '</span><script type="text/javascript">$("#tdb' . $button_counter . '").button(';
-
-    $args = array();
-
-    if ( isset($icon) ) {
-      if ( !isset($params['iconpos']) ) {
-        $params['iconpos'] = 'left';
-      }
-
-      if ( $params['iconpos'] == 'left' ) {
-        $args[] = 'icons:{primary:"ui-icon-' . $icon . '"}';
-      } else {
-        $args[] = 'icons:{secondary:"ui-icon-' . $icon . '"}';
-      }
-    }
-
-    if (empty($title)) {
-      $args[] = 'text:false';
-    }
-
-    if (!empty($args)) {
-      $button .= '{' . implode(',', $args) . '}';
-    }
-
-    $button .= ').addClass("ui-priority-' . $priority . '").parent().removeClass("tdbLink");</script>';
-
     $button_counter++;
 
     return $button;
   }
-?>
+
+  // review stars
+  function tep_draw_stars($rating = 0) {
+    $stars = str_repeat('<i class="fa fa-star"></i>', (int)$rating);
+    $stars .= str_repeat('<i class="fa fa-star-o"></i>', 5-(int)$rating);
+
+    return $stars;
+  }
