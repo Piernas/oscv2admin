@@ -17,7 +17,7 @@
   if ($messageStack->size > 0) echo $messageStack->output();
 */
 
-  class messageStack extends alertBlock {
+  class messageStack {
     var $size = 0;
 		
 	function __construct() {
@@ -66,6 +66,26 @@
     function output() {
       $this->table_data_parameters = 'class="messageBox"';
       return $this->alertBlock($this->errors);
+    }
+    
+        function alertBlock($contents) {
+      $alertBox_string = '';
+		  
+      for ($i=0, $n=sizeof($contents); $i<$n; $i++) {
+        $alertBox_string .= '  <div';
+		  
+        if (isset($contents[$i]['params']) && tep_not_null($contents[$i]['params']))
+		  $alertBox_string .= ' ' . $contents[$i]['params'];
+        
+		  $alertBox_string .= '>' . "\n";
+          $alertBox_string .= '	<button type="button" class="close" data-dismiss="alert">&times;</button>' . "\n";
+          $alertBox_string .= $contents[$i]['text'];
+    
+          $alertBox_string .= '  </div>' . "\n";
+      }
+
+      return $alertBox_string;
+
     }
   }
 ?>
