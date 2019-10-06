@@ -12,41 +12,10 @@
 
   require('includes/application_top.php');
 
-  $languages = tep_get_languages();
-  $languages_array = array();
-  $languages_selected = DEFAULT_LANGUAGE;
-  for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
-    $languages_array[] = array('id' => $languages[$i]['code'],
-                               'text' => $languages[$i]['name']);
-    if ($languages[$i]['directory'] == $language) {
-      $languages_selected = $languages[$i]['code'];
-    }
-  }
 
   require('includes/template_top.php');
 ?>
-
-    <table border="0" width="100%" cellspacing="0" cellpadding="2">
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="2" height="40">
-          <tr>
-            <td class="pageHeading"><?php echo STORE_NAME; ?></td>
-
-<?php
-  if (sizeof($languages_array) > 1) {
-?>
-
-            <td class="pageHeading" align="right"><?php echo tep_draw_form('adminlanguage', 'index.php', '', 'get') . tep_draw_pull_down_menu('language', $languages_array, $languages_selected, 'onchange="this.form.submit();"') . tep_hide_session_id() . '</form>'; ?></td>
-
-<?php
-  }
-?>
-
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="2">
+    <div class="row py-3">
 <?php
   if ( defined('MODULE_ADMIN_DASHBOARD_INSTALLED') && tep_not_null(MODULE_ADMIN_DASHBOARD_INSTALLED) ) {
     $adm_array = explode(';', MODULE_ADMIN_DASHBOARD_INSTALLED);
@@ -95,9 +64,7 @@
     }
   }
 ?>
-        </table></td>
-      </tr>
-    </table>
+    </div>
 
 <?php
   require('includes/template_bottom.php');
