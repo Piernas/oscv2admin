@@ -11,11 +11,11 @@
 */
 
   class osC_Actions {
-    public static function parse($module) {
+    public static function parse($module, $_site='shop') {
       $module = basename($module);
 
-      if ( !empty($module) && file_exists('includes/actions/' . $module . '.php') ) {
-        include('includes/actions/' . $module . '.php');
+      if ( !empty($module) && file_exists(DIR_FS_CATALOG . 'includes/actions/' . $_site . '/' . $module . '.php') ) {
+        include(DIR_FS_CATALOG . 'includes/actions/' . $_site . '/' . $module . '.php');
 
         call_user_func(array('osC_Actions_' . $module, 'execute'));
       }

@@ -2,3 +2,5 @@ admin/includes/local/configure.php
 admin/includes/languages/espanol.php
 admin/includes/languages/espanol/
 includes/local/configure.php
+*.bak
+includes/work/
