@@ -71,7 +71,7 @@
     <div class="mr-auto p-2 pageHeading"><i class="fas fa-language fa-lg"></i> <?= HEADING_TITLE ?></div>
 
     <div class="py-2">
-      <a href="<?= tep_href_link('modules_pages.php?page=customers&desired_groups=' . urlencode (json_encode(array(array('languages'), array('languages_installed', 'languages_uninstalled'))))) ?>" class="btn btn-info btn-sm"><i class="fas fa-cog"></i></a>
+      <a href="<?= tep_href_link('modules_pages.php?desired_groups=' . urlencode (json_encode(array(array('languages'), array('languages_installed', 'languages_uninstalled'))))) ?>" class="btn btn-info btn-sm"><i class="fas fa-cog"></i></a>
 
     </div>
   </div>

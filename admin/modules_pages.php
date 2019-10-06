@@ -33,9 +33,9 @@
 // $columns_group_array / ${$type . '_group_array'}
 //  ${'modules_' . $type}['installed']/['new']: ie. $modules_buttons['installed']
 
-
   $json = (isset($_GET['desired_groups']) ? json_decode(urldecode( $_GET['desired_groups']), true) : '');
   $page = $json[0][0]; 
+
   foreach ($json[1] as $value) {
     $desired_groups['group'][] = $value;
     if (count($json[1]) > 1) {
@@ -213,7 +213,7 @@
         tep_redirect(tep_href_link('modules_pages.php',tep_get_all_get_params(array ('action','module')) . 'module=' . $module->code ));
         break;
 
-      case 'install':
+      case 'modules_pages_install':
         $class = basename($_GET['module']);
         $type = $_GET['type'];
 
@@ -410,7 +410,7 @@
             }
 ?>              </td>
               <td class="actions">
-                <a href="<?=  tep_href_link('modules_pages.php', 'module=' . $module->code . '&page=' . $page . '&action=remove&type=' . $type . '&desired_groups=' . $_GET['desired_groups'])?>" title="<?= IMAGE_MODULE_REMOVE ?>"  data-toggle="tooltip"><i class="fa fa-trash fa-lg text-danger"></i></a>
+                <a href="<?=  tep_href_link('modules_pages.php', 'module=' . $module->code . '&action=remove&type=' . $type . '&desired_groups=' . $_GET['desired_groups'])?>" title="<?= IMAGE_MODULE_REMOVE ?>"  data-toggle="tooltip"><i class="fa fa-trash fa-lg text-danger"></i></a>
               </td>
             </tr>
 <?php
@@ -466,7 +466,7 @@
                 <td><?php echo $module->title; ?></td>
                 <td><?php echo $module->description; ?></td>
                 <td class="actions">
-                  <a href="<?= tep_href_link('modules_pages.php',tep_get_all_get_params(array ('action','module')) . 'action=install&module=' . $module->code  . '&type=' . $type . '&page=' . $page)?>" title="<?= IMAGE_MODULE_INSTALL ?>" data-toggle="tooltip"><i class="fa fa-plus-circle fa-lg text-info"></i></a>
+                  <a href="<?= tep_href_link('modules_pages.php',tep_get_all_get_params(array ('action','module')) . 'action=modules_pages_install&module=' . $module->code  . '&type=' . $type)?>" title="<?= IMAGE_MODULE_INSTALL ?>" data-toggle="tooltip"><i class="fa fa-plus-circle fa-lg text-info"></i></a>
                 </td>
               </tr>
 <?php
