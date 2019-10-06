@@ -5,7 +5,7 @@
   osCommerce, Open Source E-Commerce Solutions
   http://www.oscommerce.com
 
-  Copyright (c) 2003 osCommerce
+  Comyright (c) 2003 osCommerce
 
   Released under the GNU General Public License
 
@@ -17,7 +17,7 @@
   if ($messageStack->size > 0) echo $messageStack->output();
 */
 
-  class messageStack extends tableBlock {
+  class messageStack {
     var $size = 0;
 		
 	function __construct() {
@@ -35,13 +35,13 @@
 
     function add($message, $type = 'error') {
       if ($type == 'error') {
-        $this->errors[] = array('params' => 'class="messageStackError"', 'text' => tep_image('images/icons/error.gif', ICON_ERROR) . '&nbsp;' . $message);
+        $this->errors[] = array('params' => 'class="alert alert-danger alert-dismissible fade show my-2" role="alert"', 'text' => $message);
       } elseif ($type == 'warning') {
-        $this->errors[] = array('params' => 'class="messageStackWarning"', 'text' => tep_image('images/icons/warning.gif', ICON_WARNING) . '&nbsp;' . $message);
+        $this->errors[] = array('params' => 'class="alert alert-warning alert-dismissible fade show my-2" role="alert"', 'text' => $message);
       } elseif ($type == 'success') {
-        $this->errors[] = array('params' => 'class="messageStackSuccess"', 'text' => tep_image('images/icons/success.gif', ICON_SUCCESS) . '&nbsp;' . $message);
+        $this->errors[] = array('params' => 'class="alert alert-success alert-dismissible fade show my-2" role="alert"', 'text' => $message);
       } else {
-        $this->errors[] = array('params' => 'class="messageStackError"', 'text' => $message);
+        $this->errors[] = array('params' => 'class="alert alert-info alert-dismissible fade show my-2" role="alert"', 'text' => $message);
       }
 
       $this->size++;
@@ -65,7 +65,27 @@
 
     function output() {
       $this->table_data_parameters = 'class="messageBox"';
-      return $this->tableBlock($this->errors);
+      return $this->alertBlock($this->errors);
+    }
+    
+        function alertBlock($contents) {
+      $alertBox_string = '';
+		  
+      for ($i=0, $n=sizeof($contents); $i<$n; $i++) {
+        $alertBox_string .= '  <div';
+		  
+        if (isset($contents[$i]['params']) && tep_not_null($contents[$i]['params']))
+		  $alertBox_string .= ' ' . $contents[$i]['params'];
+        
+		  $alertBox_string .= '>' . "\n";
+          $alertBox_string .= '	<button type="button" class="close" data-dismiss="alert">&times;</button>' . "\n";
+          $alertBox_string .= $contents[$i]['text'];
+    
+          $alertBox_string .= '  </div>' . "\n";
+      }
+
+      return $alertBox_string;
+
     }
   }
 ?>

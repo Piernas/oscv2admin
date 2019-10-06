@@ -127,7 +127,13 @@
     $get_url = '';
 
     foreach ($_GET as $key => $value) {
-      if (($key != tep_session_name()) && ($key != 'error') && (!in_array($key, $exclude_array))) $get_url .= $key . '=' . $value . '&';
+      if (($key != tep_session_name()) && ($key != 'error') && (!in_array($key, $exclude_array))) {
+        if (is_array($value)) {
+            $get_url .= $key . '[]=' . rawurlencode(stripslashes($value[0])) . '&';
+        }else{
+            $get_url .= $key . '=' . rawurlencode(stripslashes($value)) . '&';
+        } 
+      }
     }
 
     return $get_url;
