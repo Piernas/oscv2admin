@@ -44,7 +44,7 @@ define('HTML_PARAMS','dir="ltr" lang="en"');
 define('CHARSET', 'utf-8');
 
 // page title
-define('TITLE', 'OSCOM CE Phoenix Administration Tool');
+define('TITLE', 'osCommerce Online Merchant Administration Tool');
 
 // header text in includes/header.php
 define('HEADER_TITLE_TOP', 'Administration');
@@ -61,14 +61,16 @@ define('DOB_FORMAT_STRING', 'mm/dd/yyyy');
 
 // configuration box text in includes/boxes/configuration.php
 define('BOX_HEADING_CONFIGURATION', 'Configuration');
+define('BOX_HEADING_MODULES_HOOKS', 'Hooks');
+
+define('BOX_HEADING_MODULES', 'Modules');
+define('BOX_HEADING_MODULES_CONTENT', 'Content Modules');
 define('BOX_CONFIGURATION_MYSTORE', 'My Store');
 define('BOX_CONFIGURATION_LOGGING', 'Logging');
 define('BOX_CONFIGURATION_CACHE', 'Cache');
 define('BOX_CONFIGURATION_ADMINISTRATORS', 'Administrators');
+define('BOX_CONFIGURATION_CONFIGURATION', 'General setup');
 define('BOX_CONFIGURATION_STORE_LOGO', 'Store Logo');
-
-// modules box text in includes/boxes/modules.php
-define('BOX_HEADING_MODULES', 'Modules');
 
 // categories box text in includes/boxes/catalog.php
 define('BOX_HEADING_CATALOG', 'Catalog');
@@ -105,7 +107,6 @@ define('BOX_REPORTS_ORDERS_TOTAL', 'Customer Orders-Total');
 define('BOX_HEADING_TOOLS', 'Tools');
 define('BOX_TOOLS_ACTION_RECORDER', 'Action Recorder');
 define('BOX_TOOLS_BACKUP', 'Database Backup');
-define('BOX_TOOLS_BANNER_MANAGER', 'Banner Manager');
 define('BOX_TOOLS_CACHE', 'Cache Control');
 define('BOX_TOOLS_DEFINE_LANGUAGE', 'Define Languages');
 define('BOX_TOOLS_MAIL', 'Send Email');
@@ -214,7 +215,6 @@ define('IMAGE_LOCK', 'Lock');
 define('IMAGE_MODULE_INSTALL', 'Install Module');
 define('IMAGE_MODULE_REMOVE', 'Remove Module');
 define('IMAGE_MOVE', 'Move');
-define('IMAGE_NEW_BANNER', 'New Banner');
 define('IMAGE_NEW_CATEGORY', 'New Category');
 define('IMAGE_NEW_COUNTRY', 'New Country');
 define('IMAGE_NEW_CURRENCY', 'New Currency');
@@ -261,7 +261,6 @@ define('ICON_WARNING', 'Warning');
 
 // constants for use in tep_prev_next_display function
 define('TEXT_RESULT_PAGE', 'Page %s of %d');
-define('TEXT_DISPLAY_NUMBER_OF_BANNERS', 'Displaying <strong>%d</strong> to <strong>%d</strong> (of <strong>%d</strong> banners)');
 define('TEXT_DISPLAY_NUMBER_OF_COUNTRIES', 'Displaying <strong>%d</strong> to <strong>%d</strong> (of <strong>%d</strong> countries)');
 define('TEXT_DISPLAY_NUMBER_OF_CUSTOMERS', 'Displaying <strong>%d</strong> to <strong>%d</strong> (of <strong>%d</strong> customers)');
 define('TEXT_DISPLAY_NUMBER_OF_CURRENCIES', 'Displaying <strong>%d</strong> to <strong>%d</strong> (of <strong>%d</strong> currencies)');
