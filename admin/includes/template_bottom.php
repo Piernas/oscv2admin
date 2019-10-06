@@ -11,15 +11,31 @@
 */
 ?>
 
-</div>
-
-<?php 
-require('includes/footer.php');
-
-echo $OSCOM_Hooks->call('siteWide', 'injectSiteEnd');
+<?php
+  echo $OSCOM_Hooks->call('siteWide', 'injectBeforeFooter');
 ?>
+<hr>
+<?php
+  require('includes/footer.php');
+  
+  echo $OSCOM_Hooks->call('siteWide', 'injectBodyContentEnd');
+      ?>
+      
+    </div> <!-- BodyContent//-->
 
+    
+    <?php 
+  echo $OSCOM_Hooks->call('siteWide', 'injectBodyWrapperEnd');
+?>
 <br />
+  </div> <!-- bodyWrapper //-->
+<?php 
+  echo $OSCOM_Hooks->call('siteWide', 'injectAfterFooter');
+  
+  echo $OSCOM_Hooks->call('siteWide', 'injectSiteEnd');
+  
+  echo $oscTemplate->getBlocks('admin_footer_scripts'); 
+  ?>
 
 </body>
 </html>
