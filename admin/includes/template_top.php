@@ -9,6 +9,10 @@
 
   Released under the GNU General Public License
 */
+  
+  $oscTemplate->buildBlocks();
+  
+  $OSCOM_Hooks->call('siteWide', 'injectRedirects');
 ?>
 <!DOCTYPE html>
 <html <?php echo HTML_PARAMS; ?>>
@@ -21,10 +25,9 @@
 <!--[if IE]><script type="text/javascript" src="<?php echo tep_catalog_href_link('ext/flot/excanvas.min.js', '', 'SSL'); ?>"></script><![endif]-->
 <?php 
 echo $OSCOM_Hooks->call('siteWide', 'injectSiteStart');
+echo $oscTemplate->getBlocks('admin_header_scripts');
+
 ?>
-<link rel="stylesheet" type="text/css" href="<?php echo tep_catalog_href_link('ext/jquery/ui/redmond/jquery-ui-1.10.4.min.css', '', 'SSL'); ?>">
-<script type="text/javascript" src="<?php echo tep_catalog_href_link('ext/jquery/jquery-2.2.3.min.js', '', 'SSL'); ?>"></script>
-<script type="text/javascript" src="<?php echo tep_catalog_href_link('ext/jquery/ui/jquery-ui-1.10.4.min.js', '', 'SSL'); ?>"></script>
 </head>
 <body>
   <?php echo $oscTemplate->getContent('admin_navigation'); // navbar ?>
@@ -34,17 +37,8 @@ echo $OSCOM_Hooks->call('siteWide', 'injectSiteStart');
   <?= $OSCOM_Hooks->call('siteWide', 'injectNavbar') ?>
 
 <div id="bodyWrapper" class="d-flex">
-  <?= $OSCOM_Hooks->call('siteWide', 'injectBodyWrapperStart');  ?>
+  <?= $OSCOM_Hooks->call('siteWide', 'injectBodyWrapperStart'); ?>
 <?php
-  if (tep_session_is_registered('admin')) {
-    include('includes/column_left.php');
-  } else {
-?>
-
-
-<?php
-  }
-
   echo $OSCOM_Hooks->call('siteWide', 'injectBodyContentStart');
 ?>
   <div id="BodyContent" class="container-fluid bg-light">
