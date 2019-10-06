@@ -26,12 +26,9 @@
     
     <?php 
   echo $OSCOM_Hooks->call('siteWide', 'injectBodyWrapperEnd');
-  echo $OSCOM_Hooks->call('siteWide', 'injectSiteEnd');
 ?>
-
 <br />
   </div> <!-- bodyWrapper //-->
-
 <?php 
   echo $OSCOM_Hooks->call('siteWide', 'injectAfterFooter');
   
