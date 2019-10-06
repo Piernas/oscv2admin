@@ -23,6 +23,7 @@ define('TEXT_MODULE_DIRECTORY', 'Module Directory:');
 
 define('HEADING_TITLE', 'Modules: ');
 define('TABLE_HEADING_CLASS', 'Key');
+define('TABLE_HEADING_ENABLE', 'Enabled');
 define('TABLE_HEADING_INSTALLABLE_MODULES', 'Uninstalled modules');
 define('TABLE_HEADING_NO_INSTALLABLE_MODULES', 'There are no installable modules.');
 define('TABLE_HEADING_NO_INSTALLED_MODULES', 'There are no modules available to install.');
