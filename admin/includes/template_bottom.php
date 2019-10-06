@@ -13,15 +13,25 @@
 
 <?php
   echo $OSCOM_Hooks->call('siteWide', 'injectBeforeFooter');
-
-
+?>
+<hr>
+<?php
   require('includes/footer.php');
+  
+  echo $OSCOM_Hooks->call('siteWide', 'injectBodyContentEnd');
+      ?>
+      
+    </div> <!-- BodyContent//-->
 
+    
+    <?php 
+  echo $OSCOM_Hooks->call('siteWide', 'injectBodyWrapperEnd');
   echo $OSCOM_Hooks->call('siteWide', 'injectSiteEnd');
 ?>
 
 <br />
   </div> <!-- bodyWrapper //-->
+
 <?php 
   echo $OSCOM_Hooks->call('siteWide', 'injectAfterFooter');
   
