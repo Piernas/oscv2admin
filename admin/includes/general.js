@@ -1,52 +1,24 @@
-function SetFocus() {
-  if (document.forms.length > 0) {
-    isNotAdminLanguage:
-    for (f=0; f<document.forms.length; f++) {
-      if (document.forms[f].name != "adminlanguage") {
-        var field = document.forms[f];
-        for (i=0; i<field.length; i++) {
-          if ( (field.elements[i].type != "image") &&
-               (field.elements[i].type != "hidden") &&
-               (field.elements[i].type != "reset") &&
-               (field.elements[i].type != "button") &&
-               (field.elements[i].type != "submit") ) {
+$(document).on('click', ".clickable", function () {
+ $(this).toggleClass('table-success').siblings().removeClass("table-success"); 
+});
 
-            document.forms[f].elements[i].focus();
-
-            if ( (field.elements[i].type == "text") ||
-                 (field.elements[i].type == "password") )
-              document.forms[f].elements[i].select();
-
-            break isNotAdminLanguage;
-          }
-        }
-      }
-    }
+$(function() {
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    // save the latest tab:
+    localStorage.setItem('lastTab', $(this).attr('data-target'));
+  });
+  // go to the latest tab, if it exists:
+  var lastTab = localStorage.getItem('lastTab');
+  if (lastTab) {
+    $('[data-target="' + lastTab + '"]').tab('show');
   }
-}
+});
+ $("#clear").click(function(){
+    $("input[name=search]").val('');
+});
 
-function rowOverEffect(object) {
-  if (object.className == 'dataTableRow') object.className = 'dataTableRowOver';
-}
-
-function rowOutEffect(object) {
-  if (object.className == 'dataTableRowOver') object.className = 'dataTableRow';
-}
-
-function toggleDivBlock(id) {
-  if (document.getElementById) {
-    itm = document.getElementById(id);
-  } else if (document.all){
-    itm = document.all[id];
-  } else if (document.layers){
-    itm = document.layers[id];
-  }
-
-  if (itm) {
-    if (itm.style.display != "none") {
-      itm.style.display = "none";
-    } else {
-      itm.style.display = "block";
-    }
-  }
-}
+$(document).ready(function() {
+    $(".alert-dismissible").fadeTo(2000, 300).slideUp(300, function() {
+      $(".alert-dismissible").slideUp(300);
+  });
+});
