@@ -13,7 +13,7 @@
 define('HEADING_TITLE', 'Manufacturers');
 
 define('TABLE_HEADING_MANUFACTURERS', 'Manufacturers');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_HEADING_NEW_MANUFACTURER', 'New Manufacturer');
 define('TEXT_HEADING_EDIT_MANUFACTURER', 'Edit Manufacturer');

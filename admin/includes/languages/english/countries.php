@@ -14,7 +14,7 @@ define('HEADING_TITLE', 'Countries');
 
 define('TABLE_HEADING_COUNTRY_NAME', 'Country');
 define('TABLE_HEADING_COUNTRY_CODES', 'ISO Codes');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_INFO_EDIT_INTRO', 'Please make any necessary changes');
 define('TEXT_INFO_COUNTRY_NAME', 'Name:');

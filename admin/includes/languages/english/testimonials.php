@@ -15,7 +15,7 @@ define('HEADING_TITLE', 'Testimonials');
 define('TABLE_HEADING_CUSTOMER_ID', 'Customer ID');
 define('TABLE_HEADING_CUSTOMER_NAME', 'Customer Name');
 define('TABLE_HEADING_DATE_ADDED', 'Date Added');
-define('TABLE_HEADING_ACTION', 'Action');
+
 define('TABLE_HEADING_STATUS', 'Status');
 
 define('ENTRY_PRODUCT', 'Product:');

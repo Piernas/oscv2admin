@@ -11,8 +11,15 @@
 */
 
   require('includes/application_top.php');
+  define ('OSCOM_DEVELOP_SHOW_CONSTANTS', true);// TODO: move to configuration
+    $action = (isset($_GET['action']) ? $_GET['action'] : '');
+
+ if(!$action)  {
+   require('includes/template_top.php');// moved to avoid problems with template modules
+  }
 
   $set = (isset($_GET['set']) ? $_GET['set'] : '');
+  $current_module = (isset($_GET['module']) ? $_GET['module'] : '');
 
   $modules = $cfgModules->getAll();
 
@@ -24,27 +31,206 @@
   $module_directory = $cfgModules->get($set, 'directory');
   $module_language_directory = $cfgModules->get($set, 'language_directory');
   $module_key = $cfgModules->get($set, 'key');;
-  define('HEADING_TITLE', $cfgModules->get($set, 'title'));
+//  define('HEADING_TITLE', $cfgModules->get($set, 'title'));
   $template_integration = $cfgModules->get($set, 'template_integration');
 
-  $action = (isset($_GET['action']) ? $_GET['action'] : '');
 
+  $modules_installed = (defined($module_key) ? explode(';', constant($module_key)) : array());
+
+  $file_extension = substr($PHP_SELF, strrpos($PHP_SELF, '.'));
+  $directory_array = array();
+  if ($dir = @dir($module_directory)) {
+    while ($file = $dir->read()) {
+      if (!is_dir($module_directory . $file)) {
+        if (substr($file, strrpos($file, '.')) == $file_extension) {
+          $class = substr($file, 0, strrpos($file, '.'));
+            if (!class_exists($class)) {
+              if ( file_exists($module_language_directory . $language . '/modules/' . $module_type . '/' . $file) ) {
+                include($module_language_directory . $language . '/modules/' . $module_type . '/' . $file);
+              }
+              include_once($module_directory . $file);
+            }
+
+            if (class_exists($class)) {
+              $module = new $class();
+
+              if (in_array( $class . ".php", $modules_installed)) {
+                $column_constant =($set == 'boxes') ? constant (module_get_common_prefix ($module->keys()) . 'CONTENT_PLACEMENT'): "";
+
+                $modules['installed'][] = array('code' => $class,
+                                                'title' => $module->title,
+                                                'group' => $module_directory,
+                                                'description' =>$module->description,
+                                                'sort_order' => (int)$module->sort_order,
+                                                'column' => $column_constant,
+                                                'constants_prefix' => module_get_common_prefix ($module->keys())
+                                                );
+
+              } else {
+                $modules['new'][] = array('code' => $class,
+                                              'title' => $module->title,
+                                              'group' => $module_directory,
+                                              'description' =>$module->description,);
+              }
+              unset ($module);
+            }
+          }
+      }
+    }
+    $dir->close();
+
+  }
+
+  if(array_key_exists('installed', $modules)){
+    usort($modules['installed'], 'sortbycol');
+  }
+
+
+  if ($action == 'edit' || $action =='details') {
+
+      $class = basename($current_module);
+      $module = new $class();
+      $module_keys = $module->keys();
+
+        $module_info = array('code' => $module->code,
+                             'title' => $module->title,
+                             'description' => $module->description,
+                             'status' => $module->check(),
+                             'signature' => (isset($module->signature) ? $module->signature : null),
+                             'api_version' => (isset($module->api_version) ? $module->api_version : null));
+
+     // remove column, enabled y sort_order
+
+      $module_constants = module_get_common_prefix ($module->keys());
+
+      foreach ($module_keys as $key=>$value) {
+        if ($value == ($module_constants . "SORT_ORDER")||($value == $module_constants . "CONTENT_PLACEMENT")|| ($value == $module_constants . "STATUS") )
+          unset ($module_keys [$key]);
+        }
+      $module_keys = array_values($module_keys);
+
+      $keys_extra = array();
+
+        for ($j=0, $k=sizeof($module_keys); $j<$k; $j++) {
+          $key_value_query = tep_db_query("select configuration_title, configuration_value, configuration_description, use_function, set_function from " . TABLE_CONFIGURATION . " where configuration_key = '" . $module_keys[$j] . "'");
+          $key_value = tep_db_fetch_array($key_value_query);
+
+          $keys_extra[$module_keys[$j]]['title'] = $key_value['configuration_title'];
+          $keys_extra[$module_keys[$j]]['value'] = $key_value['configuration_value'];
+          $keys_extra[$module_keys[$j]]['description'] = $key_value['configuration_description'];
+          $keys_extra[$module_keys[$j]]['use_function'] = $key_value['use_function'];
+          $keys_extra[$module_keys[$j]]['set_function'] = $key_value['set_function'];
+        }
+
+    $module_info['keys'] = $keys_extra;
+
+    $mInfo = new objectInfo($module_info);
+  }
+
+  // ACTIONS
   if (tep_not_null($action)) {
     switch ($action) {
+      case 'details':
+        echo '<span id="title"><strong><i class="fas fa-info-circle"></i> ' . $mInfo->title  . '</strong></span>';
+        echo '<span id="content"><div class="alert alert-info">' .  $mInfo->description . '</div>';
+
+        if (isset($mInfo->signature) && (list($scode, $smodule, $sversion, $soscversion) = explode('|', $mInfo->signature))) {
+          echo '<i class="fas fa-info-circle fa-lg text-info"></i>&nbsp;<strong>' . TEXT_INFO_VERSION . '</strong> ' . $sversion . ' (<a href="http://sig.oscommerce.com/' . $mInfo->signature . '" target="_blank">' . TEXT_INFO_ONLINE_STATUS . '</a>)<br>';
+        }
+
+        if (isset($mInfo->api_version)) {
+          echo '<i class="fas fa-info-circle fa-lg text-info"></i>&nbsp;<strong>' . TEXT_INFO_API_VERSION . '</strong> ' . $mInfo->api_version . '<br>';
+        }
+/*
+        if (isset($mInfo->author)) {
+          echo '<i class="fas fa-info-circle fa-lg text-info"></i>&nbsp;<strong>' . TEXT_INFO_AUTHOR . '</strong> ' . $mInfo->author . '<br>';
+        }
+*/
+        echo '</span>';
+
+        exit();
+        break;
+
+      case 'edit':
+        $keys = '';
+        reset($mInfo->keys);
+
+      foreach ($mInfo->keys as $key => $value) {
+          $keys .= '<div class="alert alert-success alert-sm"><strong>' . $value['title'] . '</strong><br>' . $value['description'];
+
+          if ($value['set_function']) {
+            eval('$keys .= ' . $value['set_function'] . "'" . $value['value'] . "', '" . $key . "');");
+          } else {
+            $keys .= tep_draw_input_field('configuration[' . $key . ']', $value['value']);
+          }
+          $keys .='</div>';
+        }
+
+        echo '<span id="title"><strong><i class="fas fa-cog"></i> ' . $mInfo->title . '</strong></span>';
+        echo '<span id="content">' .  $keys . '</span>';
+
+        exit();
+
+      break;
+
+      case 'swap_column':
+        $class = basename($current_module);
+        $module = new $class();
+
+        $column_constant = module_get_common_prefix ($module->keys()) . 'CONTENT_PLACEMENT';
+        $column = constant ($column_constant);
+        if ($column == "Left Column") {
+          $column = "Right Column";
+        } else {
+          $column = "Left Column";
+        }
+        tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . $column . "' where configuration_key = '" . $column_constant . "'");
+        tep_redirect(tep_href_link(basename(__FILE__), 'set=' . $set .  '&module=' . $class));
+
+        break;
+
+      case 'reorder':
+        $class = basename($current_module);
+        $position = $_GET['position'];
+
+      // first we update the position of this module and save its old position:
+        foreach ( $modules['installed'] as $m ) {
+          if ( $m['code'] == $class ) {
+            $module = new $class();
+            $old_position = $m['sort_order'];
+            $position_constant = module_get_common_prefix ($module->keys()) . 'SORT_ORDER';
+            $common_group = $m['group'];
+            tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . $position . "' where configuration_key = '" . $position_constant . "'");
+            $m['sort_order'] = $position;
+            break;
+          }
+        }
+
+
+        foreach ( $modules['installed'] as $m ) {
+          if ( $m['sort_order'] == $position && $m['group'] == $common_group && $m['code'] != $class ) {
+            $position = $_GET['position'];
+            $module = new $m['code']();
+            $position_constant = module_get_common_prefix ($module->keys()) . 'SORT_ORDER';
+            tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . $old_position . "' where configuration_key = '" . $position_constant . "'");
+            $m['sort_order'] = $old_position;
+            break;
+          }
+        }
+        tep_redirect(tep_href_link(basename(__FILE__), 'set=' . $set .  '&module=' . $class));
+        break;
       case 'save':
         foreach ($_POST['configuration'] as $key => $value) {
           tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . $value . "' where configuration_key = '" . $key . "'");
         }
-        tep_redirect(tep_href_link('modules.php', 'set=' . $set . '&module=' . $_GET['module']));
+        tep_redirect(tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $current_module));
         break;
       case 'install':
       case 'remove':
         $file_extension = substr($PHP_SELF, strrpos($PHP_SELF, '.'));
-        $class = basename($_GET['module']);
+        $class = basename($current_module);
         if (file_exists($module_directory . $class . $file_extension)) {
-          // include lang file
-          include($module_language_directory . $language . '/modules/' . $module_type . '/' . $class . $file_extension);
-          include($module_directory . $class . $file_extension);
+          include_once($module_directory . $class . $file_extension);
           $module = new $class;
           if ($action == 'install') {
             if ($module->check() > 0) { // remove module if already installed
@@ -60,7 +246,7 @@
             }
 
             tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . implode(';', $modules_installed) . "' where configuration_key = '" . $module_key . "'");
-            tep_redirect(tep_href_link('modules.php', 'set=' . $set . '&module=' . $class));
+            tep_redirect(tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $class));
           } elseif ($action == 'remove') {
             $module->remove();
 
@@ -71,76 +257,94 @@
             }
 
             tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . implode(';', $modules_installed) . "' where configuration_key = '" . $module_key . "'");
-            tep_redirect(tep_href_link('modules.php', 'set=' . $set));
+            tep_redirect(tep_href_link(basename(__FILE__), 'set=' . $set));
           }
         }
-        tep_redirect(tep_href_link('modules.php', 'set=' . $set . '&module=' . $class));
+        tep_redirect(tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $class));
+        break;
+
+      case 'toggle':
+        $file_extension = substr($PHP_SELF, strrpos($PHP_SELF, '.'));
+        $class = basename($current_module);
+        if (file_exists($module_directory . $class . $file_extension)) {
+          include_once($module_directory . $class . $file_extension);
+          $module = new $class;
+          $status_constant = module_get_common_prefix ($module->keys()) . 'STATUS';
+          $toggle = constant($status_constant) =='True' ? 'False': 'True' ;
+          $query = tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . $toggle  . "' where configuration_key = '" . $status_constant . "'");
+          tep_redirect(tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $class));
+        }
         break;
     }
   }
+// ACTIONS END
 
-  require('includes/template_top.php');
-
-  $modules_installed = (defined($module_key) ? explode(';', constant($module_key)) : array());
-  $new_modules_counter = 0;
-
-  $file_extension = substr($PHP_SELF, strrpos($PHP_SELF, '.'));
-  $directory_array = array();
-  if ($dir = @dir($module_directory)) {
-    while ($file = $dir->read()) {
-      if (!is_dir($module_directory . $file)) {
-        if (substr($file, strrpos($file, '.')) == $file_extension) {
-          if (isset($_GET['list']) && ($_GET['list'] = 'new')) {
-            if (!in_array($file, $modules_installed)) {
-              $directory_array[] = $file;
-            }
-          } else {
-            if (in_array($file, $modules_installed)) {
-              $directory_array[] = $file;
-            } else {
-              $new_modules_counter++;
-            }
-          }
-        }
-      }
-    }
-    sort($directory_array);
-    $dir->close();
+  $modules_groups = $cfgModules->getAll();
+  foreach ($modules_groups as $modules_group) {
+    $groupss[] = array ('id'=>$modules_group['code'], 'text' =>$modules_group['title']);
   }
 ?>
 
-    <table border="0" width="100%" cellspacing="0" cellpadding="2">
-      <tr>
-        <td width="100%"><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
-            <td class="pageHeading" align="right"><?php echo tep_draw_separator('pixel_trans.gif', HEADING_IMAGE_WIDTH, HEADING_IMAGE_HEIGHT); ?></td>
+   <div class="d-flex justify-content-between">
+
+    <div class="mr-auto p-2 pageHeading"><i class="fas fa-cogs"></i> <?= HEADING_TITLE . $cfgModules->get($set, 'title')?></div>
+    <div class="p-2 pageHeading">
+      <div class="input-group input-group-sm">
+        <div class="input-group-prepend">
+        <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
+        </div><?= tep_draw_pull_down_menu('module_group_selection', $groupss, $set, $parameters = '')?></div>
+      </div>
+  </div>
 <?php
-  if (isset($_GET['list'])) {
-    echo '            <td class="smallText" align="right">' . tep_draw_button(IMAGE_BACK, 'triangle-1-w', tep_href_link('modules.php', 'set=' . $set)) . '</td>';
-  } else {
-    echo '            <td class="smallText" align="right">' . tep_draw_button(IMAGE_MODULE_INSTALL . ' (' . $new_modules_counter . ')', 'plus', tep_href_link('modules.php', 'set=' . $set . '&list=new')) . '</td>';
+
+    if(array_key_exists('installed', $modules)){
+?>
+  <table class="table table-striped table-sm table-hover">
+    <thead>
+    <tr class="table-info">
+<?php
+  if ($set == 'shipping') {
+?>
+    <th class="text-center">*Icon*</th>
+<?php
+  }
+  if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) {
+?>
+    <th class="d-none d-sm-table-cell"><?= TABLE_HEADING_CLASS ?></th>
+<?php
   }
 ?>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td valign="top"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-              <tr class="dataTableHeadingRow">
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_MODULES; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_SORT_ORDER; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</td>
-              </tr>
+    <th><?= TABLE_HEADING_MODULES; ?></th>
+<?php
+  if ($set == 'boxes') {
+?>
+    <th class="text-center"><?= TABLE_HEADING_COLUMN ?></th>
+<?php
+  }
+  if ($set == 'shipping') {
+?>
+    <th class="text-center">*Zona*</th>
+<?php
+  }
+
+?>
+    <th class="text-center"><?= TABLE_HEADING_SORT_ORDER; ?></th>
+    <th class="text-center">*Enable*</th>
+    <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
+  </tr>
+  </thead>
+  <tbody>
 <?php
   $installed_modules = array();
-  for ($i=0, $n=sizeof($directory_array); $i<$n; $i++) {
-    $file = $directory_array[$i];
+  $group_installed_position ="";
 
-    include($module_language_directory . $language . '/modules/' . $module_type . '/' . $file);
-    include($module_directory . $file);
+    // Modules installed
+    for ($i=0, $n=sizeof($modules['installed']); $i<$n; $i++) {
+      $file = $modules['installed'][$i]['code'] . '.php';
+      if (file_exists ($module_language_directory . $language . '/modules/' . $module_type . '/' . $file)) {
+        include_once ($module_language_directory . $language . '/modules/' . $module_type . '/' . $file);
+      }
+    include_once($module_directory . $file);
 
     $class = substr($file, 0, strrpos($file, '.'));
     if (tep_class_exists($class)) {
@@ -152,53 +356,110 @@
           $installed_modules[] = $file;
         }
       }
-
-      if ((!isset($_GET['module']) || (isset($_GET['module']) && ($_GET['module'] == $class))) && !isset($mInfo)) {
-        $module_info = array('code' => $module->code,
-                             'title' => $module->title,
-                             'description' => $module->description,
-                             'status' => $module->check(),
-                             'signature' => (isset($module->signature) ? $module->signature : null),
-                             'api_version' => (isset($module->api_version) ? $module->api_version : null));
-
-        $module_keys = $module->keys();
-
-        $keys_extra = array();
-        for ($j=0, $k=sizeof($module_keys); $j<$k; $j++) {
-          $key_value_query = tep_db_query("select configuration_title, configuration_value, configuration_description, use_function, set_function from " . TABLE_CONFIGURATION . " where configuration_key = '" . $module_keys[$j] . "'");
-          $key_value = tep_db_fetch_array($key_value_query);
-
-          $keys_extra[$module_keys[$j]]['title'] = $key_value['configuration_title'];
-          $keys_extra[$module_keys[$j]]['value'] = $key_value['configuration_value'];
-          $keys_extra[$module_keys[$j]]['description'] = $key_value['configuration_description'];
-          $keys_extra[$module_keys[$j]]['use_function'] = $key_value['use_function'];
-          $keys_extra[$module_keys[$j]]['set_function'] = $key_value['set_function'];
-        }
-
-        $module_info['keys'] = $keys_extra;
-
-        $mInfo = new objectInfo($module_info);
+?>
+    <tr class="clickable">
+<?php
+      if ($set =='shipping') {
+        //       <td><?=  $module->icon ? '<img src="' .tep_catalog_href_link ($module->icon) . '" height="30" width="60">':""; 
+?>
+      <td><?=  $module->icon ? tep_image(tep_catalog_href_link ($module->icon)) :""; ?></td>
+<?php
       }
 
-      if (isset($mInfo) && is_object($mInfo) && ($class == $mInfo->code) ) {
-        if ($module->check() > 0) {
-          echo '              <tr id="defaultSelected" class="dataTableRowSelected" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('modules.php', 'set=' . $set . '&module=' . $class . '&action=edit') . '\'">' . "\n";
-        } else {
-          echo '              <tr id="defaultSelected" class="dataTableRowSelected" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)">' . "\n";
-        }
-      } else {
-        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('modules.php', 'set=' . $set . (isset($_GET['list']) ? '&list=new' : '') . '&module=' . $class) . '\'">' . "\n";
+      if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) {
+?>
+      <td class="d-none d-sm-table-cell"><small><?= $module->code; ?></small></td>
+<?php
       }
 ?>
-                <td class="dataTableContent"><?php echo $module->title; ?></td>
-                <td class="dataTableContent" align="right"><?php if (in_array($module->code . $file_extension, $modules_installed) && is_numeric($module->sort_order)) echo $module->sort_order; ?></td>
-                <td class="dataTableContent" align="right"><?php if (isset($mInfo) && is_object($mInfo) && ($class == $mInfo->code) ) { echo tep_image('images/icon_arrow_right.gif'); } else { echo '<a href="' . tep_href_link('modules.php', 'set=' . $set . (isset($_GET['list']) ? '&list=new' : '') . '&module=' . $class) . '">' . tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '</a>'; } ?>&nbsp;</td>
-              </tr>
+      <td><?= $module->title ?></td>
+<?php
+    // columna
+      if ($set == 'boxes') {
+        $column ="";
+        if ($modules['installed'][$i]['column'] == "Left Column") {
+          $column = " fa-rotate-180";
+        }
+?>
+    <td class="text-center"><a href="<?= tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $module->code . '&action=swap_column') ?>"><i class="fas fa-toggle-on fa-lg text-primary<?= $column ?>"></i></a></td>
+<?php
+      }
+
+  if ($set == 'shipping') {
+?>
+    <td class="text-center"><?= (isset($module->zone) ? tep_get_geo_zone_name($module->zone) : "-"); ?></td>
+<?php
+  }
+
+
+      $sort_order_constant = module_get_common_prefix ($module->keys()) . 'SORT_ORDER';
+      // Changes sort_order to consecutive numbers
+      $group_installed_position ++;
+      $changed = module_set_sort_order ($sort_order_constant, $group_installed_position, $module->sort_order);
+      if ($changed == true) {
+        $module->sort_order = $group_installed_position;
+      }
+
+      $button_up ="";
+      $button_down ="";
+      $sort_order ="";
+      if (defined($sort_order_constant)) {
+        $sort_order = $module->sort_order;
+        if ($sort_order > 1)  {
+          $button_up = '<a href="' . tep_href_link($PHP_SELF, 'set=' . $set . '&module=' . $module->code . '&action=reorder&position=' . ($sort_order - 1)) . '"><i class="fas fa-chevron-circle-up fa-lg text-primary"></i></a>';
+        } else {
+          $button_up = '<i class="fas fa-chevron-circle-up fa-lg text-muted"></i>';
+        }
+        if ($sort_order < count ($modules_installed) )  {
+          $button_down = '<a href="' . tep_href_link($PHP_SELF, 'set=' . $set . '&module=' . $module->code . '&action=reorder&position=' . ($sort_order + 1)) . '"><i class="fas fa-chevron-circle-down fa-lg text-primary"></i></a>';
+        } else {
+          $button_down = '<i class="fas fa-chevron-circle-down fa-lg text-muted"></i>';
+        }
+      }
+?>
+      <td class="text-center" nowrap><?= $button_up .  " " . $sort_order . " " . $button_down;?></td>
+      <td class="text-center"><?php
+
+      if ($module->check()) {
+        $status_constant = module_get_common_prefix ($module->keys()) . 'STATUS';
+        if (defined ($status_constant) ) {
+          $status_value = constant($status_constant);
+          if (strtolower ($status_value)=="true") {
+            echo '<i class="fas fa-circle fa-lg text-success"></i>&nbsp;&nbsp;<a href="' . tep_href_link(basename(__FILE__), 'set=' . $set . '&action=toggle&module=' . $class) . '"><i class="far fa-circle fa-lg text-danger"></i></a>';
+          } elseif ($module->enabled < 1)  {
+            echo '<a href="' .  tep_href_link(basename(__FILE__), 'set=' . $set . '&action=toggle&module=' . $class) . '"><i class="far fa-circle fa-lg text-success"></i></a>&nbsp;&nbsp;<i class="fas fa-circle fa-lg text-danger"></i>';
+          }
+        }
+      }
+
+?></td>
+      <td class="actions text-nowrap">
+        <a href="javascript:ModalInfo('<?=$class ?>');"><i class="fas fa-info-circle fa-lg text-info"></i></a>
+<?php
+      // Remove general setup options already available on main page:
+        $module_keys =$module->keys();
+        foreach ($module_keys as $key=>$value) {
+        if ($value == ($modules['installed'][$i]['constants_prefix'] . "SORT_ORDER")||($value == $modules['installed'][$i]['constants_prefix'] . "CONTENT_PLACEMENT")|| ($value == $modules['installed'][$i]['constants_prefix'] . "STATUS") )
+          unset ($module_keys [$key]);
+        }
+
+        if (sizeof($module_keys)) {
+?>
+        <a href="javascript:ModalEdit('<?=$class ?>');"><i class="fas fa-cog fa-lg text-primary"></i></a>
+<?php
+        } else {
+?>
+        <i class="fas fa-cog fa-lg text-muted"></i>
+<?php
+        }
+?>
+        <a href="<?= tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $class . '&action=remove')?>"><i class="fas fa-trash fa-lg text-danger"></i></a>
+      </td>
+    </tr>
 <?php
     }
   }
 
-  if (!isset($_GET['list'])) {
     ksort($installed_modules);
     $check_query = tep_db_query("select configuration_value from " . TABLE_CONFIGURATION . " where configuration_key = '" . $module_key . "'");
     if (tep_db_num_rows($check_query)) {
@@ -224,110 +485,214 @@
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Installed Template Block Groups', 'TEMPLATE_BLOCK_GROUPS', '" . $module_type . "', 'This is automatically updated. No need to edit.', '6', '0', now())");
       }
     }
-  }
+
 ?>
-              <tr>
-                <td colspan="3" class="smallText"><?php echo TEXT_MODULE_DIRECTORY . ' ' . $module_directory; ?></td>
-              </tr>
-            </table></td>
+  </tbody>
+  <?php
+         $colspan =5;
+        if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) $colspan++;
+        if ($set =='shipping')  $colspan++;
+
+
+  ?>
+  <tfoot>
+    <tr>
+      <td colspan="<?= $colspan?>" class="table-info smallText"><?= TEXT_MODULE_DIRECTORY . ' ' . $module_directory; ?></td>
+    </tr>
+    </tfoot>
+  </table>
+  <?php
+  } else{
+  // New Modules available for install
+?>
+    <div class="alert alert-warning"><i class="fas fa-warning"></i> <strong><?= TABLE_HEADING_NO_INSTALLED_MODULES ?></strong></div>
 <?php
-  $heading = array();
-  $contents = array();
-
-  switch ($action) {
-    case 'edit':
-      $keys = '';
-      foreach ($mInfo->keys as $key => $value) {
-        $keys .= '<strong>' . $value['title'] . '</strong><br />' . $value['description'] . '<br />';
-
-        if ($value['set_function']) {
-          eval('$keys .= ' . $value['set_function'] . "'" . $value['value'] . "', '" . $key . "');");
-        } else {
-          $keys .= tep_draw_input_field('configuration[' . $key . ']', $value['value']);
-        }
-        $keys .= '<br /><br />';
-      }
-      $keys = substr($keys, 0, strrpos($keys, '<br /><br />'));
-
-      $heading[] = array('text' => '<strong>' . $mInfo->title . '</strong>');
-
-      $contents = array('form' => tep_draw_form('modules', 'modules.php', 'set=' . $set . '&module=' . $_GET['module'] . '&action=save'));
-      $contents[] = array('text' => $keys);
-      $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(IMAGE_SAVE, 'disk', null, 'primary') . tep_draw_button(IMAGE_CANCEL, 'close', tep_href_link('modules.php', 'set=' . $set . '&module=' . $_GET['module'])));
-      break;
-    default:
-      if (isset($mInfo)) {
-        $heading[] = array('text' => '<strong>' . $mInfo->title . '</strong>');
-
-        if (in_array($mInfo->code . $file_extension, $modules_installed) && ($mInfo->status > 0)) {
-          $keys = '';
-          foreach ($mInfo->keys as $value) {
-            $keys .= '<strong>' . $value['title'] . '</strong><br />';
-            if ($value['use_function']) {
-              $use_function = $value['use_function'];
-              if (preg_match('/->/', $use_function)) {
-                $class_method = explode('->', $use_function);
-                if (!isset(${$class_method[0]}) || !is_object(${$class_method[0]})) {
-                  include('includes/classes/' . $class_method[0] . '.php');
-                  ${$class_method[0]} = new $class_method[0]();
-                }
-                $keys .= tep_call_function($class_method[1], $value['value'], ${$class_method[0]});
-              } else {
-                $keys .= tep_call_function($use_function, $value['value']);
-              }
-            } else {
-              $keys .= $value['value'];
-            }
-            $keys .= '<br /><br />';
-          }
-          $keys = substr($keys, 0, strrpos($keys, '<br /><br />'));
-
-          $contents[] = array('align' => 'center', 'text' => tep_draw_button(IMAGE_EDIT, 'document', tep_href_link('modules.php', 'set=' . $set . '&module=' . $mInfo->code . '&action=edit')) . tep_draw_button(IMAGE_MODULE_REMOVE, 'minus', tep_href_link('modules.php', 'set=' . $set . '&module=' . $mInfo->code . '&action=remove')));
-
-          if (isset($mInfo->signature) && (list($scode, $smodule, $sversion, $soscversion) = explode('|', $mInfo->signature))) {
-            $contents[] = array('text' => '<br />' . tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '&nbsp;<strong>' . TEXT_INFO_VERSION . '</strong> ' . $sversion . ' (<a href="http://sig.oscommerce.com/' . $mInfo->signature . '" target="_blank">' . TEXT_INFO_ONLINE_STATUS . '</a>)');
-          }
-
-          if (isset($mInfo->api_version)) {
-            $contents[] = array('text' => tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '&nbsp;<strong>' . TEXT_INFO_API_VERSION . '</strong> ' . $mInfo->api_version);
-          }
-
-          $contents[] = array('text' => '<br />' . $mInfo->description);
-          $contents[] = array('text' => '<br />' . $keys);
-        } elseif (isset($_GET['list']) && ($_GET['list'] == 'new')) {
-          if (isset($mInfo)) {
-            $contents[] = array('align' => 'center', 'text' => tep_draw_button(IMAGE_MODULE_INSTALL, 'plus', tep_href_link('modules.php', 'set=' . $set . '&module=' . $mInfo->code . '&action=install')));
-
-            if (isset($mInfo->signature) && (list($scode, $smodule, $sversion, $soscversion) = explode('|', $mInfo->signature))) {
-              $contents[] = array('text' => '<br />' . tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '&nbsp;<strong>' . TEXT_INFO_VERSION . '</strong> ' . $sversion . ' (<a href="http://sig.oscommerce.com/' . $mInfo->signature . '" target="_blank">' . TEXT_INFO_ONLINE_STATUS . '</a>)');
-            }
-
-            if (isset($mInfo->api_version)) {
-              $contents[] = array('text' => tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '&nbsp;<strong>' . TEXT_INFO_API_VERSION . '</strong> ' . $mInfo->api_version);
-            }
-
-            $contents[] = array('text' => '<br />' . $mInfo->description);
-          }
-        }
-      }
-      break;
   }
-
-  if ( (tep_not_null($heading)) && (tep_not_null($contents)) ) {
-    echo '            <td width="25%" valign="top">' . "\n";
-
-    $box = new box;
-    echo $box->infoBox($heading, $contents);
-
-    echo '            </td>' . "\n";
-  }
+if (isset ($modules['new']))  {
+  $num_uninstalled = sizeof($modules['new']);
 ?>
-          </tr>
-        </table></td>
+  <table class="table table-striped table-sm table-hover">
+    <thead>
+      <tr class="table-info">
+<?php
+        if ($set =='shipping') {
+?>
+        <th></th>
+<?php
+        }
+      
+  if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) {
+?>
+    <th class="d-none d-sm-table-cell"><?= TABLE_HEADING_CLASS ?></th>
+<?php
+  }
+          if ($set =='shipping')  $colspan++;
+
+?>
+        <th colspan="2"><?= TABLE_HEADING_INSTALLABLE_MODULES; ?></th>
+        <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
       </tr>
-    </table>
+      </thead>
+    <tbody>
+ <?php
+    foreach ( $modules['new'] as $m ) { // itera los módulos no instalados
+      $module = new $m['code']();
+      $buttons = tep_draw_button ('Install', 'fas fa-plus', tep_href_link($PHP_SELF, 'action=install&set=' . $set . '&module=' . $m['code']),null, null, "btn-primary btn-sm");
+      $description = preg_replace('(<div\s+class="secWarning">.*?<\/div>)', '', $m['description']);
+      preg_match('(<div\s+class="secWarning">.*?<\/div>)', $m['description'], $warning);
+?>
+    <tr class="clickable">
+<?php
+      if ($set =='shipping') {
+?>
+      <td><?=  $module->icon ? tep_image(tep_catalog_href_link ($module->icon)) :""; ?></td>
+<?php
+
+      } 
+      if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) {
+?>
+      <td class="hidden-xs"><small><?= $module->code; ?></small></td>
 
 <?php
+      }
+?>
+      <td><?= $m['title']; ?></td>
+      <td><div><?= $description;?></div></td>
+      <td class="actions text-nowrap"><?= $buttons; ?></td>
+    </tr>
+<?php
+      unset ($module);
+    }
+?>
+    </tbody>
+  <?php
+    $colspan=3;
+    if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) $colspan++;
+    if ($set =='shipping') $colspan++;
+
+  ?>
+    <tfoot>
+    <tr class="table-info">
+
+      <td colspan="<?= $colspan ?>" class="text-center"><?= ($num_uninstalled > 0 ?  MODULES_AVAILABLE . $num_uninstalled : NO_MODULES_AVAILABLE) ?></td>
+    </tr>
+    </tfoot>
+  </table>
+
+<?php
+  } else {
+?>
+    <div class="col-sm-12 text-center bg-info"><?= TABLE_HEADING_NO_INSTALLABLE_MODULES ?></div>
+<?php
+  }
+
+  function module_get_common_prefix ($prefix_array){
+    sort($prefix_array);
+    $s1 = $prefix_array[0];
+    $s2 = $prefix_array[count($prefix_array)-1];
+    $len = min(strlen($s1), strlen($s2));
+    for ($i=0; $i<$len && $s1[$i]==$s2[$i]; $i++);
+    $prefix = substr($s1, 0, $i);
+    preg_match ('/(.*_)*/', $prefix,  $clean_prefix ) ;
+    return $clean_prefix[1];
+  }
+
+  function module_set_sort_order ($cfg_key_sort_order, $new_order, $old_order) {
+    if ((int)$old_order != (int)$new_order ) {
+      tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = " . $new_order. " where configuration_key = '" . $cfg_key_sort_order . "'");
+      return true;
+    } else {
+      return false;
+    }
+  }
+/*
+  function sortbyorder($a, $b) {
+    return strnatcmp($a['group'] . '-' . (int)$a['sort_order'] . '-' . $a['title'], $b['group'] . '-' . (int)$b['sort_order'] . '-' . $b['title']);
+  }
+*/
+    function sortbycol($a, $b) {
+    return strnatcmp($a['group'] . '-' . $a['column'] . '-' . $a['sort_order'], $b['group'] . '-' . $b['column'] . '-' . $b['sort_order']);
+  }
+?>
+
+<?php
+
+  require ("includes/classes/modal.php");
+
+
+  $modal = new modal();
+  $modal->button_save = true;
+  $modal->button_delete = false;
+  $modal->button_cancel = true;
+  $modal->output();
+
+?>
+
+<?php
+$image_cancel = IMAGE_CANCEL;
+$image_close = IMAGE_CLOSE;
+$jScript = <<<EOD
+$('#modulesModal').on('shown.bs.modal', function () {
+    $('#modulesModal').scrollTop(0);
+});
+function ModalInfo(moduleClass){
+  $("form > .modal-content").unwrap();
+  $("#ButtonCancelText").text("$image_close");
+  $("#ModalButtonSave").hide();
+
+   var params = {"module" : moduleClass, "action" : "details", "set" : "$set"};
+    $.ajax({
+      data:  params,
+      url:   'modules.php',
+      type:  'get',
+      cache: false,
+      beforeSend: function () {
+        $(".modal-body").html("Procesando, espere por favor...");
+      },
+      success:  function (response) {
+        $(".modal-title").html($(response).filter('#title').html());
+        $(".modal-body").html($(response).filter('#content').html());
+        $("#modulesModal").modal('show')
+
+      }
+    });
+}
+
+function ModalEdit(moduleClass){
+  $("form > .modal-content").unwrap();
+  $(".modal-content").wrap('<form id="modules_form" name="modules" action="modules.php?action=save&set=$set" method="post">')
+  $("#ButtonCancelText").text("$image_cancel");
+  $("#ModalButtonSave").show();
+
+   var params = {"module" : moduleClass, "action" : "edit", "set" : "$set"};
+    $.ajax({
+      data:  params,
+      url:   'modules.php',
+      type:  'get',
+      cache: false,
+      beforeSend: function () {
+        $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+      },
+      success:  function (response) {
+        $(".modal-title").html($(response).filter('#title').html());
+        $(".modal-body").html($(response).filter('#content').html());
+        $("#modulesModal").modal('show')
+      }
+    });
+}
+    $(function(){
+      $('select[name="module_group_selection"]').on('change', function () {
+          var url = 'modules.php?set='+ $(this).val();
+          if (url) {
+              window.location = url;
+          }
+          return false;
+      });
+    });
+EOD;
+
+  $oscTemplate->addBlock('<script>' . $jScript . '</script>', 'admin_footer_scripts');
   require('includes/template_bottom.php');
+
   require('includes/application_bottom.php');
 ?>

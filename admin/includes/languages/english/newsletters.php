@@ -17,7 +17,7 @@ define('TABLE_HEADING_SIZE', 'Size');
 define('TABLE_HEADING_MODULE', 'Module');
 define('TABLE_HEADING_SENT', 'Sent');
 define('TABLE_HEADING_STATUS', 'Status');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_NEWSLETTER_MODULE', 'Module:');
 define('TEXT_NEWSLETTER_TITLE', 'Newsletter Title:');

@@ -15,7 +15,7 @@ define('HEADING_TITLE', 'Currencies');
 define('TABLE_HEADING_CURRENCY_NAME', 'Currency');
 define('TABLE_HEADING_CURRENCY_CODES', 'Code');
 define('TABLE_HEADING_CURRENCY_VALUE', 'Value');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_INFO_EDIT_INTRO', 'Please make any necessary changes');
 define('TEXT_INFO_COMMON_CURRENCIES', '-- Common Currencies --');

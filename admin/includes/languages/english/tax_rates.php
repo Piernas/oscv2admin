@@ -17,7 +17,7 @@ define('TABLE_HEADING_TAX_CLASS_TITLE', 'Tax Class');
 define('TABLE_HEADING_COUNTRIES_NAME', 'Country');
 define('TABLE_HEADING_ZONE', 'Zone');
 define('TABLE_HEADING_TAX_RATE', 'Tax Rate');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_INFO_EDIT_INTRO', 'Please make any necessary changes');
 define('TEXT_INFO_DATE_ADDED', 'Date Added:');

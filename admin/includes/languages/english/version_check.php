@@ -14,7 +14,7 @@ define('HEADING_TITLE', 'Version Checker');
 
 define('TABLE_HEADING_VERSION', 'Version');
 define('TABLE_HEADING_RELEASED', 'Release Date');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_RELEASE_LINK', 'View Release Annoucement');
 

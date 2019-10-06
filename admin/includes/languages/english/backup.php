@@ -15,7 +15,7 @@ define('HEADING_TITLE', 'Database Backup Manager');
 define('TABLE_HEADING_TITLE', 'Title');
 define('TABLE_HEADING_FILE_DATE', 'Date');
 define('TABLE_HEADING_FILE_SIZE', 'Size');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_INFO_HEADING_NEW_BACKUP', 'New Backup');
 define('TEXT_INFO_HEADING_RESTORE_LOCAL', 'Restore Local');

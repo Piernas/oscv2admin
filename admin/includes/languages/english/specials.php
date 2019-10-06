@@ -15,7 +15,7 @@ define('HEADING_TITLE', 'Specials');
 define('TABLE_HEADING_PRODUCTS', 'Products');
 define('TABLE_HEADING_PRODUCTS_PRICE', 'Products Price');
 define('TABLE_HEADING_STATUS', 'Status');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_SPECIALS_PRODUCT', 'Product:');
 define('TEXT_SPECIALS_SPECIAL_PRICE', 'Special Price:');
