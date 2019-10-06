@@ -329,7 +329,7 @@
 
 ?>
     <th class="text-center"><?= TABLE_HEADING_SORT_ORDER; ?></th>
-    <th class="text-center">*Enable*</th>
+    <th class="text-center"><?= TABLE_HEADING_ENABLE; ?></th>
     <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
   </tr>
   </thead>
