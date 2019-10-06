@@ -306,3 +306,10 @@ define('MODULE_CONTENT_BOOTSTRAP_ROW_DESCRIPTION', '<p>Content Width can be 12 o
 
 // seo helper
 define('PLACEHOLDER_COMMA_SEPARATION', 'Must, Be, Comma, Separated');
+
+// modal dialogs
+define('TEXT_AJAX_PROCESSING', 'Processing...');
+define('TEXT_AJAX_WAIT', 'Please wait...');
+define('IMAGE_CLOSE', 'Close');
+
+define('TABLE_HEADING_ACTION', 'Action');

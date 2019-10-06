@@ -16,7 +16,7 @@ define('TABLE_HEADING_BANNERS', 'Banners');
 define('TABLE_HEADING_GROUPS', 'Groups');
 define('TABLE_HEADING_STATISTICS', 'Displays / Clicks');
 define('TABLE_HEADING_STATUS', 'Status');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_BANNERS_TITLE', 'Banner Title:');
 define('TEXT_BANNERS_URL', 'Banner URL:');

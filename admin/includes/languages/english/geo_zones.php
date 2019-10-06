@@ -15,7 +15,7 @@ define('HEADING_TITLE', 'Tax Zones');
 define('TABLE_HEADING_COUNTRY', 'Country');
 define('TABLE_HEADING_COUNTRY_ZONE', 'Zone');
 define('TABLE_HEADING_TAX_ZONES', 'Tax Zones');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_INFO_HEADING_NEW_ZONE', 'New Zone');
 define('TEXT_INFO_NEW_ZONE_INTRO', 'Please enter the new zone information');

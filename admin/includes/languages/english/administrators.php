@@ -14,7 +14,7 @@ define('HEADING_TITLE', 'Administrators');
 
 define('TABLE_HEADING_ADMINISTRATORS', 'Administrators');
 define('TABLE_HEADING_HTPASSWD', 'Secured by htpasswd');
-define('TABLE_HEADING_ACTION', 'Action');
+
 
 define('TEXT_INFO_INSERT_INTRO', 'Please enter the new administrator with its related data');
 define('TEXT_INFO_EDIT_INTRO', 'Please make any necessary changes');
