@@ -84,47 +84,41 @@
 
   require('includes/template_top.php');
 ?>
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="d-flex justify-content-between">
+        <div class="mr-auto p-2 pageHeading"><i class="fas fa-microphone fa-lg"></i> <?= HEADING_TITLE ?></div>
+        <div class="p-2">
+          <?= tep_draw_form('filter', 'action_recorder.php', '', 'get', 'class="form-inline"')?>
 
-    <table border="0" width="100%" cellspacing="0" cellpadding="2">
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="2" height="40">
-          <tr>
-            <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
-            <td align="right"><table border="0" width="100%" cellspacing="0" cellpadding="0">
-              <tr>
-                <td class="smallText" align="right">
+            <div class="form-group form-group-sm pr-2">
 <?php
-  echo tep_draw_form('search', 'action_recorder.php', '', 'get');
-  echo TEXT_FILTER_SEARCH . ' ' . tep_draw_input_field('search');
-  echo tep_draw_hidden_field('module') . tep_hide_session_id() . '</form>';
+  if (isset($_GET['search']) && !empty($_GET['search']))
+      echo '              <div class="input-group-prepend"><button class="btn btn-sm btn-info" id="clear"><i class="fa fa-times"></i></button></div>'; 
 ?>
-                </td>
-              </tr>
-              <tr>
-                <td class="smallText" align="right">
-<?php
-  echo tep_draw_form('filter', 'action_recorder.php', '', 'get');
-  echo tep_draw_pull_down_menu('module', $modules_list_array, null, 'onchange="this.form.submit();"');
-  echo tep_draw_hidden_field('search') . tep_hide_session_id() . '</form>';
-?>
-                </td>
-              </tr>
-            </table></td>
-            <td class="smallText" align="right"><?php echo tep_draw_button(IMAGE_DELETE, 'trash', tep_href_link('action_recorder.php', 'action=expire' . (isset($_GET['module']) && in_array($_GET['module'], $modules_array) ? '&module=' . $_GET['module'] : '')), 'primary'); ?></td>
-          </tr>
-        </table></td>
+              <?= tep_draw_input_field('search', null, 'size="20" placeholder="' . HEADING_TITLE_SEARCH . '"') ?>
+              <div class="input-group-append"><button class="btn btn-sm btn-info" type="submit"><i class="fas fa-search"></i></button></div>
+            </div>
+            <div class="form-group form-group-sm pr-2"><?= tep_draw_pull_down_menu('module', $modules_list_array, null, 'onchange="this.form.submit();"')?></div>
+              <?php echo tep_draw_button(IMAGE_DELETE, 'fa fa-trash', tep_href_link('action_recorder.php', 'action=expire' . (isset($_GET['module']) && in_array($_GET['module'], $modules_array) ? '&module=' . $_GET['module'] : ''))); ?>
+              <?=  tep_hide_session_id()?>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" id="page-content">
+
+    <table class="table table-sm table-striped table-hover">
+      <thead>
+      <tr class="table-info">
+        <th width="20">&nbsp;</th>
+        <th><?php echo TABLE_HEADING_MODULE; ?></th>
+        <th><?php echo TABLE_HEADING_CUSTOMER; ?></th>
+        <th class="text-right"><?php echo TABLE_HEADING_IDENTIFIER; ?></th>
+        <th class="text-right"><?php echo TABLE_HEADING_DATE_ADDED; ?></th>
       </tr>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td valign="top"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-              <tr class="dataTableHeadingRow">
-                <td class="dataTableHeadingContent" width="20">&nbsp;</td>
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_MODULE; ?></td>
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_CUSTOMER; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_DATE_ADDED; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</td>
-              </tr>
+      </thead>
+      <tbody>
 <?php
   $filter = array();
 
@@ -135,10 +129,10 @@
   if (isset($_GET['search']) && !empty($_GET['search'])) {
     $filter[] = " identifier like '%" . tep_db_input($_GET['search']) . "%' ";
   }
-
   $actions_query_raw = "select * from " . TABLE_ACTION_RECORDER . (!empty($filter) ? " where " . implode(" and ", $filter) : "") . " order by date_added desc";
   $actions_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $actions_query_raw, $actions_query_numrows);
   $actions_query = tep_db_query($actions_query_raw);
+  
   while ($actions = tep_db_fetch_array($actions_query)) {
     $module = $actions['module'];
 
@@ -154,59 +148,26 @@
       $aInfo_array = array_merge($actions, $actions_extra, array('module' => $module_title));
       $aInfo = new objectInfo($aInfo_array);
     }
-
-    if ( (isset($aInfo) && is_object($aInfo)) && ($actions['id'] == $aInfo->id) ) {
-      echo '                  <tr id="defaultSelected" class="dataTableRowSelected" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)">' . "\n";
-    } else {
-      echo '                  <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('action_recorder.php', tep_get_all_get_params(array('aID')) . 'aID=' . $actions['id']) . '\'">' . "\n";
-    }
 ?>
-                <td class="dataTableContent" align="center"><?php echo tep_image('images/icons/' . (($actions['success'] == '1') ? 'tick.gif' : 'cross.gif')); ?></td>
-                <td class="dataTableContent"><?php echo $module_title; ?></td>
-                <td class="dataTableContent"><?php echo tep_output_string_protected($actions['user_name']) . ' [' . (int)$actions['user_id'] . ']'; ?></td>
-                <td class="dataTableContent" align="right"><?php echo tep_datetime_short($actions['date_added']); ?></td>
-                <td class="dataTableContent" align="right"><?php if ( (isset($aInfo) && is_object($aInfo)) && ($actions['id'] == $aInfo->id) ) { echo tep_image('images/icon_arrow_right.gif', ''); } else { echo '<a href="' . tep_href_link('action_recorder.php', tep_get_all_get_params(array('aID')) . 'aID=' . $actions['id']) . '">' . tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '</a>'; } ?>&nbsp;</td>
-              </tr>
-<?php
-  }
-?>
-              <tr>
-                <td colspan="5"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-                  <tr>
-                    <td class="smallText" valign="top"><?php echo $actions_split->display_count($actions_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_ENTRIES); ?></td>
-                    <td class="smallText" align="right"><?php echo $actions_split->display_links($actions_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], (isset($_GET['module']) && in_array($_GET['module'], $modules_array) && is_object(${$_GET['module']}) ? 'module=' . $_GET['module'] : null) . '&' . (isset($_GET['search']) && !empty($_GET['search']) ? 'search=' . $_GET['search'] : null)); ?></td>
-                  </tr>
-                </table></td>
-              </tr>
-            </table></td>
-<?php
-  $heading = array();
-  $contents = array();
-
-  switch ($action) {
-    default:
-      if (isset($aInfo) && is_object($aInfo)) {
-        $heading[] = array('text' => '<strong>' . $aInfo->module . '</strong>');
-
-        $contents[] = array('text' => TEXT_INFO_IDENTIFIER . '<br /><br />' . (!empty($aInfo->identifier) ? '<a href="' . tep_href_link('action_recorder.php', 'search=' . $aInfo->identifier) . '"><u>' . tep_output_string_protected($aInfo->identifier) . '</u></a>': '(empty)'));
-        $contents[] = array('text' => '<br />' . TEXT_INFO_DATE_ADDED . ' ' . tep_datetime_short($aInfo->date_added));
-      }
-      break;
-  }
-
-  if ( (tep_not_null($heading)) && (tep_not_null($contents)) ) {
-    echo '            <td width="25%" valign="top">' . "\n";
-
-    $box = new box;
-    echo $box->infoBox($heading, $contents);
-
-    echo '            </td>' . "\n";
-  }
-?>
+        <tr>
+          <td class="text-center"><i class="fa fa-<?= (($actions['success'] == '1') ? 'check text-success' : 'times text-danger'); ?> fa-lg"></i></td>
+            <td><?php echo $module_title; ?></td>
+            <td><?php echo tep_output_string_protected($actions['user_name']) . ' [' . (int)$actions['user_id'] . ']'; ?></td>
+            <td class="text-right"><?php echo tep_output_string_protected($actions['identifier'])  ?></td>
+            <td class="text-right"><?php echo tep_datetime_short($actions['date_added']); ?></td>
           </tr>
-        </table></td>
-      </tr>
-    </table>
+<?php
+  }
+?>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" class="smallText" valign="top"><?php echo $actions_split->display_count($actions_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_ENTRIES); ?></td>
+          <td colspan="2" class="smallText" align="right"><?php echo $actions_split->display_links($actions_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], 
+          (isset($_GET['module']) && in_array($_GET['module'], $modules_array) && is_object(${$_GET['module']}) ? 'module=' . $_GET['module'] : null) . (isset($_GET['search']) && !empty($_GET['search']) ? '&search=' . $_GET['search'] : null)); ?></td>
+        </tr>
+      </tfoot>
+        </table>
 
 <?php
   require('includes/template_bottom.php');
