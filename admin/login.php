@@ -24,7 +24,7 @@
 
   if (tep_not_null($action)) {
     switch ($action) {
-      case 'process':
+      case 'login_process':
         if (tep_session_is_registered('redirect_origin') && isset($redirect_origin['auth_user']) && !isset($_POST['username'])) {
           $username = tep_db_prepare_input($redirect_origin['auth_user']);
           $password = tep_db_prepare_input($redirect_origin['auth_pw']);
@@ -94,7 +94,7 @@
 
         break;
 
-      case 'create':
+      case 'create_admin':
         $check_query = tep_db_query("select id from " . TABLE_ADMINISTRATORS . " limit 1");
 
         if (tep_db_num_rows($check_query) == 0) {
@@ -112,16 +112,6 @@
     }
   }
 
-  $languages = tep_get_languages();
-  $languages_array = array();
-  $languages_selected = DEFAULT_LANGUAGE;
-  for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
-    $languages_array[] = array('id' => $languages[$i]['code'],
-                               'text' => $languages[$i]['name']);
-    if ($languages[$i]['directory'] == $language) {
-      $languages_selected = $languages[$i]['code'];
-    }
-  }
 
   $admins_check_query = tep_db_query("select id from " . TABLE_ADMINISTRATORS . " limit 1");
   if (tep_db_num_rows($admins_check_query) < 1) {
@@ -131,56 +121,37 @@
   require('includes/template_top.php');
 ?>
 
-<table border="0" width="100%" cellspacing="2" cellpadding="2">
-  <tr>
-    <td><table border="0" width="100%" cellspacing="0" cellpadding="0" height="40">
-      <tr>
-        <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
 
 <?php
-  if (sizeof($languages_array) > 1) {
-?>
-
-        <td class="pageHeading" align="right"><?php echo tep_draw_form('adminlanguage', 'index.php', '', 'get') . tep_draw_pull_down_menu('language', $languages_array, $languages_selected, 'onchange="this.form.submit();"') . tep_hide_session_id() . '</form>'; ?></td>
-
-<?php
-  }
-?>
-
-      </tr>
-    </table></td>
-  </tr>
-  <tr>
-    <td>
-
-<?php
-  $heading = array();
-  $contents = array();
 
   if (tep_db_num_rows($admins_check_query) > 0) {
-    $heading[] = array('text' => '<strong>' . HEADING_TITLE . '</strong>');
-
-    $contents = array('form' => tep_draw_form('login', 'login.php', 'action=process'));
-    $contents[] = array('text' => TEXT_USERNAME . '<br />' . tep_draw_input_field('username'));
-    $contents[] = array('text' => '<br />' . TEXT_PASSWORD . '<br />' . tep_draw_password_field('password'));
-    $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(BUTTON_LOGIN, 'key'));
+    $action ="login_process";
+    $title = HEADING_TITLE;
+    $button = BUTTON_LOGIN;
   } else {
-    $heading[] = array('text' => '<strong>' . HEADING_TITLE . '</strong>');
-
-    $contents = array('form' => tep_draw_form('login', 'login.php', 'action=create'));
-    $contents[] = array('text' => TEXT_CREATE_FIRST_ADMINISTRATOR);
-    $contents[] = array('text' => '<br />' . TEXT_USERNAME . '<br />' . tep_draw_input_field('username'));
-    $contents[] = array('text' => '<br />' . TEXT_PASSWORD . '<br />' . tep_draw_password_field('password'));
-    $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(BUTTON_CREATE_ADMINISTRATOR, 'key'));
+    $action ="create_admin";
+    $title = TEXT_CREATE_FIRST_ADMINISTRATOR;
+    $button = BUTTON_LOGIN;
   }
-
-  $box = new box;
-  echo $box->infoBox($heading, $contents);
 ?>
+  <div class="row">
+    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto my-5">
+      <div class="card ">
+        <div class="card-header">
+        <?= $title  ?>
+        </div>
+        <div class="card-body">
+          <?= tep_draw_form('login', 'login.php', 'action=' . $action) ?>
+            <div class="form-group"><?=  tep_draw_input_field('username','','placeholder="' . TEXT_USERNAME . '"')?></div>
+            <div class="form-group"><?=  tep_draw_input_field('password','','placeholder="' . TEXT_PASSWORD . '"')?></div>
+          <button class="btn btn-lg btn-primary btn-block"><?= $button ?></button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    </td>
-  </tr>
-</table>
+
 
 <?php
   require('includes/template_bottom.php');
