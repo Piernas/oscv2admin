@@ -19,9 +19,6 @@
   <div class="card my-3">
     <div class="card-header" id="page-heading">
       <div class="mr-auto p-2 pageHeading"><i class="fas fa-folder fa-lg"></i> <?= HEADING_TITLE  ?></div>
-
-
-
     </div>
     <div class="card-body" id="page-content">
 <?php

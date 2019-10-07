@@ -11,6 +11,7 @@
 */
 
   require('includes/application_top.php');
+  require ('includes/classes/customer.php');
 
   $action = (isset($_GET['action']) ? $_GET['action'] : '');
 
@@ -19,7 +20,8 @@
 
   if (tep_not_null($action)) {
     switch ($action) {
-      case 'update':
+      case 'customers_update':
+      /*
         $customers_id = tep_db_prepare_input($_GET['cID']);
         $customers_firstname = tep_db_prepare_input($_POST['customers_firstname']);
         $customers_lastname = tep_db_prepare_input($_POST['customers_lastname']);
@@ -195,9 +197,9 @@
           $cInfo = new objectInfo($_POST);
           $processed = true;
         }
-
+*/
         break;
-      case 'deleteconfirm':
+      case 'customers_delete_confirm':
         $customers_id = tep_db_prepare_input($_GET['cID']);
 
         if (isset($_POST['delete_reviews']) && ($_POST['delete_reviews'] == 'on')) {
@@ -229,470 +231,72 @@
 
   require('includes/template_top.php');
 
-  if ($action == 'edit' || $action == 'update') {
-?>
-<script type="text/javascript"><!--
-
-function check_form() {
-  var error = 0;
-  var error_message = "<?php echo JS_ERROR; ?>";
-
-  var customers_firstname = document.customers.customers_firstname.value;
-  var customers_lastname = document.customers.customers_lastname.value;
-<?php if (ACCOUNT_COMPANY == 'true') echo 'var entry_company = document.customers.entry_company.value;' . "\n"; ?>
-<?php if (ACCOUNT_DOB == 'true') echo 'var customers_dob = document.customers.customers_dob.value;' . "\n"; ?>
-  var customers_email_address = document.customers.customers_email_address.value;
-  var entry_street_address = document.customers.entry_street_address.value;
-  var entry_postcode = document.customers.entry_postcode.value;
-  var entry_city = document.customers.entry_city.value;
-  var customers_telephone = document.customers.customers_telephone.value;
-
-<?php if (ACCOUNT_GENDER == 'true') { ?>
-  if (document.customers.customers_gender[0].checked || document.customers.customers_gender[1].checked) {
-  } else {
-    error_message = error_message + "<?php echo JS_GENDER; ?>";
-    error = 1;
-  }
-<?php } ?>
-
-  if (customers_firstname.length < <?php echo ENTRY_FIRST_NAME_MIN_LENGTH; ?>) {
-    error_message = error_message + "<?php echo JS_FIRST_NAME; ?>";
-    error = 1;
-  }
-
-  if (customers_lastname.length < <?php echo ENTRY_LAST_NAME_MIN_LENGTH; ?>) {
-    error_message = error_message + "<?php echo JS_LAST_NAME; ?>";
-    error = 1;
-  }
-
-<?php if (ACCOUNT_DOB == 'true') { ?>
-  if (customers_dob.length < <?php echo ENTRY_DOB_MIN_LENGTH; ?>) {
-    error_message = error_message + "<?php echo JS_DOB; ?>";
-    error = 1;
-  }
-<?php } ?>
-
-  if (customers_email_address.length < <?php echo ENTRY_EMAIL_ADDRESS_MIN_LENGTH; ?>) {
-    error_message = error_message + "<?php echo JS_EMAIL_ADDRESS; ?>";
-    error = 1;
-  }
-
-  if (entry_street_address.length < <?php echo ENTRY_STREET_ADDRESS_MIN_LENGTH; ?>) {
-    error_message = error_message + "<?php echo JS_ADDRESS; ?>";
-    error = 1;
-  }
-
-  if (entry_postcode.length < <?php echo ENTRY_POSTCODE_MIN_LENGTH; ?>) {
-    error_message = error_message + "<?php echo JS_POST_CODE; ?>";
-    error = 1;
-  }
-
-  if (entry_city.length < <?php echo ENTRY_CITY_MIN_LENGTH; ?>) {
-    error_message = error_message + "<?php echo JS_CITY; ?>";
-    error = 1;
-  }
-
-<?php
-  if (ACCOUNT_STATE == 'true') {
-?>
-  if (document.customers.elements['entry_state'].type != "hidden") {
-    if (document.customers.entry_state.value.length < <?php echo ENTRY_STATE_MIN_LENGTH; ?>) {
-       error_message = error_message + "<?php echo JS_STATE; ?>";
-       error = 1;
-    }
-  }
-<?php
-  }
 ?>
 
-  if (document.customers.elements['entry_country_id'].type != "hidden") {
-    if (document.customers.entry_country_id.value == 0) {
-      error_message = error_message + "<?php echo JS_COUNTRY; ?>";
-      error = 1;
-    }
-  }
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="d-flex justify-content-between">
+        <div class="mr-auto pageHeading"><i class="fas fa-users fa-lg"></i> <?= HEADING_TITLE ?></div>
+        <div class="pr-2">
+          <?= tep_draw_form('search', basename($PHP_SELF),"" ,"get" ,'class="form-inline"') ?>
 
-  if (customers_telephone.length < <?php echo ENTRY_TELEPHONE_MIN_LENGTH; ?>) {
-    error_message = error_message + "<?php echo JS_TELEPHONE; ?>";
-    error = 1;
-  }
+            <div class="form-group form-group-sm">
+              <?= tep_draw_input_field('cID', null, ' size="12" placeholder="' . HEADING_TITLE_SEARCH . '"') ?>
 
-  if (error == 1) {
-    alert(error_message);
-    return false;
-  } else {
-    return true;
-  }
-}
-//--></script>
+              <?= tep_draw_hidden_field('action', 'edit'); ?>
+
+              <div class="input-group-append"><button class="btn btn-sm btn-info" type="submit"><i class="fas fa-search"></i></button></div>
+            </div>
+            <?= tep_hide_session_id() ?>
+
+          </form>
+        </div>
+
+        <div>
+          <a href="<?= tep_href_link('modules_pages.php?page=customers&desired_groups=' . urlencode (json_encode(array(array('customers'), array('customers'))))) ?>" class="btn btn-info btn-sm"><i class="fas fa-cog"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" id="page-content">
+
 <?php
-  }
+
+  require ('includes/classes/modules_pages.php');
+
+  $customers_modules = new modules_pages ('customers');
+    
 ?>
 
-    <table border="0" width="100%" cellspacing="0" cellpadding="2">
-<?php
-  if ($action == 'edit' || $action == 'update') {
-    $newsletter_array = array(array('id' => '1', 'text' => ENTRY_NEWSLETTER_YES),
-                              array('id' => '0', 'text' => ENTRY_NEWSLETTER_NO));
-?>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
-            <td class="pageHeading" align="right"><?php echo tep_draw_separator('pixel_trans.gif', HEADING_IMAGE_WIDTH, HEADING_IMAGE_HEIGHT); ?></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
-      </tr>
-      <tr><?php echo tep_draw_form('customers', 'customers.php', tep_get_all_get_params(array('action')) . 'action=update', 'post', 'onsubmit="return check_form();"') . tep_draw_hidden_field('default_address_id', $cInfo->customers_default_address_id); ?>
-        <td class="formAreaTitle"><?php echo CATEGORY_PERSONAL; ?></td>
-      </tr>
-      <tr>
-        <td class="formArea"><table border="0" cellspacing="2" cellpadding="2">
-<?php
-    if (ACCOUNT_GENDER == 'true') {
-?>
-          <tr>
-            <td class="main"><?php echo ENTRY_GENDER; ?></td>
-            <td class="main">
-<?php
-    if ($error == true) {
-      if ($entry_gender_error == true) {
-        echo tep_draw_radio_field('customers_gender', 'm', false, $cInfo->customers_gender) . '&nbsp;&nbsp;' . MALE . '&nbsp;&nbsp;' . tep_draw_radio_field('customers_gender', 'f', false, $cInfo->customers_gender) . '&nbsp;&nbsp;' . FEMALE . '&nbsp;' . ENTRY_GENDER_ERROR;
-      } else {
-        echo ($cInfo->customers_gender == 'm') ? MALE : FEMALE;
-        echo tep_draw_hidden_field('customers_gender');
-      }
-    } else {
-      echo tep_draw_radio_field('customers_gender', 'm', false, $cInfo->customers_gender) . '&nbsp;&nbsp;' . MALE . '&nbsp;&nbsp;' . tep_draw_radio_field('customers_gender', 'f', false, $cInfo->customers_gender) . '&nbsp;&nbsp;' . FEMALE;
-    }
-?></td>
-          </tr>
-<?php
-    }
-?>
-          <tr>
-            <td class="main"><?php echo ENTRY_FIRST_NAME; ?></td>
-            <td class="main">
-<?php
-  if ($error == true) {
-    if ($entry_firstname_error == true) {
-      echo tep_draw_input_field('customers_firstname', $cInfo->customers_firstname, 'maxlength="32"') . '&nbsp;' . ENTRY_FIRST_NAME_ERROR;
-    } else {
-      echo $cInfo->customers_firstname . tep_draw_hidden_field('customers_firstname');
-    }
-  } else {
-    echo tep_draw_input_field('customers_firstname', $cInfo->customers_firstname, 'maxlength="32"', true);
-  }
-?></td>
-          </tr>
-          <tr>
-            <td class="main"><?php echo ENTRY_LAST_NAME; ?></td>
-            <td class="main">
-<?php
-  if ($error == true) {
-    if ($entry_lastname_error == true) {
-      echo tep_draw_input_field('customers_lastname', $cInfo->customers_lastname, 'maxlength="32"') . '&nbsp;' . ENTRY_LAST_NAME_ERROR;
-    } else {
-      echo $cInfo->customers_lastname . tep_draw_hidden_field('customers_lastname');
-    }
-  } else {
-    echo tep_draw_input_field('customers_lastname', $cInfo->customers_lastname, 'maxlength="32"', true);
-  }
-?></td>
-          </tr>
-<?php
-    if (ACCOUNT_DOB == 'true') {
-?>
-          <tr>
-            <td class="main"><?php echo ENTRY_DATE_OF_BIRTH; ?></td>
-            <td class="main">
-<?php
-    if ($error == true) {
-      if ($entry_date_of_birth_error == true) {
-        echo tep_draw_input_field('customers_dob', tep_date_short($cInfo->customers_dob), 'maxlength="10"') . '&nbsp;' . ENTRY_DATE_OF_BIRTH_ERROR;
-      } else {
-        echo $cInfo->customers_dob . tep_draw_hidden_field('customers_dob');
-      }
-    } else {
-      echo tep_draw_input_field('customers_dob', tep_date_short($cInfo->customers_dob), 'maxlength="10" id="customers_dob"', true);
-    }
-?>
-              <script type="text/javascript">$('#customers_dob').datepicker({dateFormat: '<?php echo JQUERY_DATEPICKER_FORMAT; ?>', changeMonth: true, changeYear: true, yearRange: '-100:+0'});</script>
-            </td>
-          </tr>
-<?php
-    }
-?>
-          <tr>
-            <td class="main"><?php echo ENTRY_EMAIL_ADDRESS; ?></td>
-            <td class="main">
-<?php
-  if ($error == true) {
-    if ($entry_email_address_error == true) {
-      echo tep_draw_input_field('customers_email_address', $cInfo->customers_email_address, 'maxlength="96"') . '&nbsp;' . ENTRY_EMAIL_ADDRESS_ERROR;
-    } elseif ($entry_email_address_check_error == true) {
-      echo tep_draw_input_field('customers_email_address', $cInfo->customers_email_address, 'maxlength="96"') . '&nbsp;' . ENTRY_EMAIL_ADDRESS_CHECK_ERROR;
-    } elseif ($entry_email_address_exists == true) {
-      echo tep_draw_input_field('customers_email_address', $cInfo->customers_email_address, 'maxlength="96"') . '&nbsp;' . ENTRY_EMAIL_ADDRESS_ERROR_EXISTS;
-    } else {
-      echo $customers_email_address . tep_draw_hidden_field('customers_email_address');
-    }
-  } else {
-    echo tep_draw_input_field('customers_email_address', $cInfo->customers_email_address, 'maxlength="96"', true);
-  }
-?></td>
-          </tr>
-        </table></td>
-      </tr>
-<?php
-    if (ACCOUNT_COMPANY == 'true') {
-?>
-      <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
-      </tr>
-      <tr>
-        <td class="formAreaTitle"><?php echo CATEGORY_COMPANY; ?></td>
-      </tr>
-      <tr>
-        <td class="formArea"><table border="0" cellspacing="2" cellpadding="2">
-          <tr>
-            <td class="main"><?php echo ENTRY_COMPANY; ?></td>
-            <td class="main">
-<?php
-    if ($error == true) {
-      echo $cInfo->entry_company . tep_draw_hidden_field('entry_company');
-    } else {
-      echo tep_draw_input_field('entry_company', $cInfo->entry_company, 'maxlength="32"');
-    }
-?></td>
-          </tr>
-        </table></td>
-      </tr>
-<?php
-    }
-?>
-      <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
-      </tr>
-      <tr>
-        <td class="formAreaTitle"><?php echo CATEGORY_ADDRESS; ?></td>
-      </tr>
-      <tr>
-        <td class="formArea"><table border="0" cellspacing="2" cellpadding="2">
-          <tr>
-            <td class="main"><?php echo ENTRY_STREET_ADDRESS; ?></td>
-            <td class="main">
-<?php
-  if ($error == true) {
-    if ($entry_street_address_error == true) {
-      echo tep_draw_input_field('entry_street_address', $cInfo->entry_street_address, 'maxlength="64"') . '&nbsp;' . ENTRY_STREET_ADDRESS_ERROR;
-    } else {
-      echo $cInfo->entry_street_address . tep_draw_hidden_field('entry_street_address');
-    }
-  } else {
-    echo tep_draw_input_field('entry_street_address', $cInfo->entry_street_address, 'maxlength="64"', true);
-  }
-?></td>
-          </tr>
-<?php
-    if (ACCOUNT_SUBURB == 'true') {
-?>
-          <tr>
-            <td class="main"><?php echo ENTRY_SUBURB; ?></td>
-            <td class="main">
-<?php
-    if ($error == true) {
-      echo $cInfo->entry_suburb . tep_draw_hidden_field('entry_suburb');
-    } else {
-      echo tep_draw_input_field('entry_suburb', $cInfo->entry_suburb, 'maxlength="32"');
-    }
-?></td>
-          </tr>
-<?php
-    }
-?>
-          <tr>
-            <td class="main"><?php echo ENTRY_POST_CODE; ?></td>
-            <td class="main">
-<?php
-  if ($error == true) {
-    if ($entry_post_code_error == true) {
-      echo tep_draw_input_field('entry_postcode', $cInfo->entry_postcode, 'maxlength="8"') . '&nbsp;' . ENTRY_POST_CODE_ERROR;
-    } else {
-      echo $cInfo->entry_postcode . tep_draw_hidden_field('entry_postcode');
-    }
-  } else {
-    echo tep_draw_input_field('entry_postcode', $cInfo->entry_postcode, 'maxlength="8"', true);
-  }
-?></td>
-          </tr>
-          <tr>
-            <td class="main"><?php echo ENTRY_CITY; ?></td>
-            <td class="main">
-<?php
-  if ($error == true) {
-    if ($entry_city_error == true) {
-      echo tep_draw_input_field('entry_city', $cInfo->entry_city, 'maxlength="32"') . '&nbsp;' . ENTRY_CITY_ERROR;
-    } else {
-      echo $cInfo->entry_city . tep_draw_hidden_field('entry_city');
-    }
-  } else {
-    echo tep_draw_input_field('entry_city', $cInfo->entry_city, 'maxlength="32"', true);
-  }
-?></td>
-          </tr>
-<?php
-    if (ACCOUNT_STATE == 'true') {
-?>
-          <tr>
-            <td class="main"><?php echo ENTRY_STATE; ?></td>
-            <td class="main">
-<?php
-    $entry_state = tep_get_zone_name($cInfo->entry_country_id, $cInfo->entry_zone_id, $cInfo->entry_state);
-    if ($error == true) {
-      if ($entry_state_error == true) {
-        if ($entry_state_has_zones == true) {
-          $zones_array = array();
-          $zones_query = tep_db_query("select zone_name from " . TABLE_ZONES . " where zone_country_id = '" . tep_db_input($cInfo->entry_country_id) . "' order by zone_name");
-          while ($zones_values = tep_db_fetch_array($zones_query)) {
-            $zones_array[] = array('id' => $zones_values['zone_name'], 'text' => $zones_values['zone_name']);
-          }
-          echo tep_draw_pull_down_menu('entry_state', $zones_array) . '&nbsp;' . ENTRY_STATE_ERROR;
-        } else {
-          echo tep_draw_input_field('entry_state', tep_get_zone_name($cInfo->entry_country_id, $cInfo->entry_zone_id, $cInfo->entry_state)) . '&nbsp;' . ENTRY_STATE_ERROR;
-        }
-      } else {
-        echo $entry_state . tep_draw_hidden_field('entry_zone_id') . tep_draw_hidden_field('entry_state');
-      }
-    } else {
-      echo tep_draw_input_field('entry_state', tep_get_zone_name($cInfo->entry_country_id, $cInfo->entry_zone_id, $cInfo->entry_state));
-    }
-
-?></td>
-         </tr>
-<?php
-    }
-?>
-          <tr>
-            <td class="main"><?php echo ENTRY_COUNTRY; ?></td>
-            <td class="main">
-<?php
-  if ($error == true) {
-    if ($entry_country_error == true) {
-      echo tep_draw_pull_down_menu('entry_country_id', tep_get_countries(), $cInfo->entry_country_id) . '&nbsp;' . ENTRY_COUNTRY_ERROR;
-    } else {
-      echo tep_get_country_name($cInfo->entry_country_id) . tep_draw_hidden_field('entry_country_id');
-    }
-  } else {
-    echo tep_draw_pull_down_menu('entry_country_id', tep_get_countries(), $cInfo->entry_country_id);
-  }
-?></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
-      </tr>
-      <tr>
-        <td class="formAreaTitle"><?php echo CATEGORY_CONTACT; ?></td>
-      </tr>
-      <tr>
-        <td class="formArea"><table border="0" cellspacing="2" cellpadding="2">
-          <tr>
-            <td class="main"><?php echo ENTRY_TELEPHONE_NUMBER; ?></td>
-            <td class="main">
-<?php
-  if ($error == true) {
-    if ($entry_telephone_error == true) {
-      echo tep_draw_input_field('customers_telephone', $cInfo->customers_telephone, 'maxlength="32"') . '&nbsp;' . ENTRY_TELEPHONE_NUMBER_ERROR;
-    } else {
-      echo $cInfo->customers_telephone . tep_draw_hidden_field('customers_telephone');
-    }
-  } else {
-    echo tep_draw_input_field('customers_telephone', $cInfo->customers_telephone, 'maxlength="32"', true);
-  }
-?></td>
-          </tr>
-          <tr>
-            <td class="main"><?php echo ENTRY_FAX_NUMBER; ?></td>
-            <td class="main">
-<?php
-  if ($processed == true) {
-    echo $cInfo->customers_fax . tep_draw_hidden_field('customers_fax');
-  } else {
-    echo tep_draw_input_field('customers_fax', $cInfo->customers_fax, 'maxlength="32"');
-  }
-?></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
-      </tr>
-      <tr>
-        <td class="formAreaTitle"><?php echo CATEGORY_OPTIONS; ?></td>
-      </tr>
-      <tr>
-        <td class="formArea"><table border="0" cellspacing="2" cellpadding="2">
-          <tr>
-            <td class="main"><?php echo ENTRY_NEWSLETTER; ?></td>
-            <td class="main">
-<?php
-  if ($processed == true) {
-    if ($cInfo->customers_newsletter == '1') {
-      echo ENTRY_NEWSLETTER_YES;
-    } else {
-      echo ENTRY_NEWSLETTER_NO;
-    }
-    echo tep_draw_hidden_field('customers_newsletter');
-  } else {
-    echo tep_draw_pull_down_menu('customers_newsletter', $newsletter_array, (($cInfo->customers_newsletter == '1') ? '1' : '0'));
-  }
-?></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
-      </tr>
-      <tr>
-        <td align="right" class="smallText"><?php echo tep_draw_button(IMAGE_SAVE, 'disk', null, 'primary') . tep_draw_button(IMAGE_CANCEL, 'close', tep_href_link('customers.php', tep_get_all_get_params(array('action')))); ?></td>
-      </tr></form>
-<?php
-  } else {
-?>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr><?php echo tep_draw_form('search', 'customers.php', '', 'get'); ?>
-            <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
-            <td class="pageHeading" align="right"><?php echo tep_draw_separator('pixel_trans.gif', 1, HEADING_IMAGE_HEIGHT); ?></td>
-            <td class="smallText" align="right"><?php echo HEADING_TITLE_SEARCH . ' ' . tep_draw_input_field('search'); ?></td>
-          <?php echo tep_hide_session_id(); ?></form></tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td valign="top"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-              <tr class="dataTableHeadingRow">
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_LASTNAME; ?></td>
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_FIRSTNAME; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_ACCOUNT_CREATED; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</td>
-              </tr>
+      <table class="table table-sm">
+        <thead>
+        <tr class="table-info">
+  <?= $customers_modules->get_table_header () ?>
+          <th class="actions"><?php echo TABLE_HEADING_ACTION; ?></th>
+        </tr>
+        </thead>
+        <tbody>
 <?php
     $search = '';
     if (isset($_GET['search']) && tep_not_null($_GET['search'])) {
       $keywords = tep_db_input(tep_db_prepare_input($_GET['search']));
       $search = "where c.customers_lastname like '%" . $keywords . "%' or c.customers_firstname like '%" . $keywords . "%' or c.customers_email_address like '%" . $keywords . "%'";
     }
+    
     $customers_query_raw = "select c.customers_id, c.customers_lastname, c.customers_firstname, c.customers_email_address, a.entry_country_id from " . TABLE_CUSTOMERS . " c left join " . TABLE_ADDRESS_BOOK . " a on c.customers_id = a.customers_id and c.customers_default_address_id = a.address_book_id " . $search . " order by c.customers_lastname, c.customers_firstname";
+//    $customers_query = tep_db_query($customers_query_raw);
+    
+    
+    
+    $customers_query =  tep_db_query ("select customers_id from " . TABLE_CUSTOMERS);
     $customers_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $customers_query_raw, $customers_query_numrows);
-    $customers_query = tep_db_query($customers_query_raw);
+
+    
     while ($customers = tep_db_fetch_array($customers_query)) {
+//      echo $customers['customers_id'];
+      $customer = new customer ($customers['customers_id']);
+
+      
+  /*    
       $info_query = tep_db_query("select customers_info_date_account_created as date_account_created, customers_info_date_account_last_modified as date_account_last_modified, customers_info_date_of_last_logon as date_last_logon, customers_info_number_of_logons as number_of_logons from " . TABLE_CUSTOMERS_INFO . " where customers_info_id = '" . $customers['customers_id'] . "'");
       $info = tep_db_fetch_array($info_query);
 
@@ -714,34 +318,44 @@ function check_form() {
       } else {
         echo '          <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('customers.php', tep_get_all_get_params(array('cID')) . 'cID=' . $customers['customers_id']) . '\'">' . "\n";
       }
+*/
 ?>
-                <td class="dataTableContent"><?php echo $customers['customers_lastname']; ?></td>
-                <td class="dataTableContent"><?php echo $customers['customers_firstname']; ?></td>
-                <td class="dataTableContent" align="right"><?php echo tep_date_short($info['date_account_created']); ?></td>
-                <td class="dataTableContent" align="right"><?php if (isset($cInfo) && is_object($cInfo) && ($customers['customers_id'] == $cInfo->customers_id)) { echo tep_image('images/icon_arrow_right.gif', ''); } else { echo '<a href="' . tep_href_link('customers.php', tep_get_all_get_params(array('cID')) . 'cID=' . $customers['customers_id']) . '">' . tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '</a>'; } ?>&nbsp;</td>
-              </tr>
+
+        <tr class="clickable">
+
 <?php
+    echo $customers_modules->get_table_row ($customers['customers_id']);
+?>
+          <td class="actions">
+            <?= $customers_modules->get_action_buttons($customers['customers_id']); ?>
+          </td>
+        </tr>
+<?php
+
     }
 ?>
-              <tr>
-                <td colspan="4"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-                  <tr>
-                    <td class="smallText" valign="top"><?php echo $customers_split->display_count($customers_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_CUSTOMERS); ?></td>
-                    <td class="smallText" align="right"><?php echo $customers_split->display_links($customers_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], tep_get_all_get_params(array('page', 'info', 'x', 'y', 'cID'))); ?></td>
-                  </tr>
+
+      </tbody>
+
+    </table>
+    </div>
+    <div class="card-footer">
+      <div class="row">
+        <div class="col-6"><?= $customers_split->display_count($customers_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_ORDERS); ?></div>
+        <div class="col-6 text-right"><?= $customers_split->display_links($customers_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], tep_get_all_get_params(array('page', 'cID', 'action'))) ?></div>
 <?php
     if (isset($_GET['search']) && tep_not_null($_GET['search'])) {
 ?>
-                  <tr>
-                    <td class="smallText" align="right" colspan="2"><?php echo tep_draw_button(IMAGE_RESET, 'arrowrefresh-1-w', tep_href_link('customers.php')); ?></td>
-                  </tr>
+        <div class="smallText" align="right" colspan="2"><?php echo tep_draw_button(IMAGE_RESET, 'arrowrefresh-1-w', tep_href_link('customers.php')); ?></div>
 <?php
     }
 ?>
-                </table></td>
-              </tr>
-            </table></td>
+      </div>
+    </div>
+
+    
 <?php
+/*
   $heading = array();
   $contents = array();
 
@@ -758,7 +372,10 @@ function check_form() {
       if (isset($cInfo) && is_object($cInfo)) {
         $heading[] = array('text' => '<strong>' . $cInfo->customers_firstname . ' ' . $cInfo->customers_lastname . '</strong>');
 
-        $contents[] = array('align' => 'center', 'text' => tep_draw_button(IMAGE_EDIT, 'document', tep_href_link('customers.php', tep_get_all_get_params(array('cID', 'action')) . 'cID=' . $cInfo->customers_id . '&action=edit')) . tep_draw_button(IMAGE_DELETE, 'trash', tep_href_link('customers.php', tep_get_all_get_params(array('cID', 'action')) . 'cID=' . $cInfo->customers_id . '&action=confirm')) . tep_draw_button(IMAGE_ORDERS, 'cart', tep_href_link('orders.php', 'cID=' . $cInfo->customers_id)) . tep_draw_button(IMAGE_EMAIL, 'mail-closed', tep_href_link('mail.php', 'customer=' . $cInfo->customers_email_address)));
+        $contents[] = array('align' => 'center', 'text' => 
+        tep_draw_button(IMAGE_EDIT, 'document', tep_href_link('customers.php', tep_get_all_get_params(array('cID', 'action')) . 'cID=' . $cInfo->customers_id . '&action=edit')) .
+        tep_draw_button(IMAGE_DELETE, 'trash', tep_href_link('customers.php', tep_get_all_get_params(array('cID', 'action')) . 'cID=' . $cInfo->customers_id . '&action=customers_delete')) . 
+        tep_draw_button(IMAGE_ORDERS, 'cart', tep_href_link('orders.php', 'cID=' . $cInfo->customers_id)) . tep_draw_button(IMAGE_EMAIL, 'mail-closed', tep_href_link('mail.php', 'customer=' . $cInfo->customers_email_address)));
         $contents[] = array('text' => '<br />' . TEXT_DATE_ACCOUNT_CREATED . ' ' . tep_date_short($cInfo->date_account_created));
         $contents[] = array('text' => '<br />' . TEXT_DATE_ACCOUNT_LAST_MODIFIED . ' ' . tep_date_short($cInfo->date_account_last_modified));
         $contents[] = array('text' => '<br />' . TEXT_INFO_DATE_LAST_LOGON . ' '  . tep_date_short($cInfo->date_last_logon));
@@ -777,14 +394,9 @@ function check_form() {
 
     echo '            </td>' . "\n";
   }
+  */
 ?>
-          </tr>
-        </table></td>
-      </tr>
-<?php
-  }
-?>
-    </table>
+
 
 <?php
   require('includes/template_bottom.php');

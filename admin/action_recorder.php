@@ -167,7 +167,7 @@
           (isset($_GET['module']) && in_array($_GET['module'], $modules_array) && is_object(${$_GET['module']}) ? 'module=' . $_GET['module'] : null) . (isset($_GET['search']) && !empty($_GET['search']) ? '&search=' . $_GET['search'] : null)); ?></td>
         </tr>
       </tfoot>
-        </table>
+    </table>
 
 <?php
   require('includes/template_bottom.php');
