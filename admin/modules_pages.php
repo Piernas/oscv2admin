@@ -261,20 +261,23 @@ fwrite($handle, $data);
 
   require('includes/template_top.php');
 ?>
-  <div class="d-flex justify-content-between">
-    <div class="mr-auto p-2 pageHeading"><i class="fas fa-cogs"></i> <?= sprintf (HEADING_TITLE_MODULES_PAGES, $page) ?></div>
-    <div class="py-2"><a href="<?= tep_href_link($page . ".php" ) ?>" class="btn btn-info btn-sm"><i class="fas fa-undo"></i> <?= TEXT_RETURN ?></a></div>
-  </div>
-
-  <div class="row">
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="d-flex justify-content-between">
+        <div class="mr-auto p-2 pageHeading"><i class="fas fa-cogs"></i> <?= sprintf (HEADING_TITLE_MODULES_PAGES, $page) ?></div>
+        <div class="py-2"><a href="<?= tep_href_link($page . ".php" ) ?>" class="btn btn-info btn-sm"><i class="fas fa-undo"></i> <?= TEXT_RETURN ?></a></div>
+      </div>
+    </div>
+    <div class="card-body" id="page-content">
+      <div class="row">
 <?php
    foreach ($types as $type) {
 ?>
-  <div id="columnsTabs" class="col-lg-6">
-  <div class="d-flex justify-content-between">
-    <div class="mr-auto p-2 pageHeading"><i class="fas fa-table"></i> <?= constant ('HEADING_TITLE_' . strtoupper($type)) ?></div>
-  </div>
-    <ul id="ColumnsTabsMain" class="nav nav-pills">
+        <div id="columnsTabs" class="col-lg-6">
+          <div class="d-flex justify-content-between">
+            <div class="mr-auto p-2 pageHeading"><i class="fas fa-table"></i> <?= constant ('HEADING_TITLE_' . strtoupper($type)) ?></div>
+          </div>
+          <ul id="ColumnsTabsMain" class="nav nav-pills">
 <?php
   ksort  (${$type . '_group_array'}); ///////////////////// aqui????
 
@@ -286,7 +289,7 @@ fwrite($handle, $data);
      
     //  if (in_array($group_item, $desired_groups['group'])) {
   ?>
-      <li class="nav-item"><a class="nav-link<?= $first ?>" data-target ="#section_<?= $type ?>_<?= $group_item ?>" data-toggle="tab"><?= $desired_groups['header'][$tab_title_index] ?></a></li>
+            <li class="nav-item"><a class="nav-link<?= $first ?>" data-target ="#section_<?= $type ?>_<?= $group_item ?>" data-toggle="tab"><?= $desired_groups['header'][$tab_title_index] ?></a></li>
 <?php
 
       $first = "";
@@ -294,12 +297,12 @@ fwrite($handle, $data);
     }
   }
 ?>
-    </ul>
+          </ul>
 <?php
 /////////////
 // Setup div:
 ?>
-    <div class="tab-content">
+          <div class="tab-content">
 <?php
   $first=' active';
 
@@ -309,23 +312,23 @@ fwrite($handle, $data);
     if (in_array($group_item, $desired_groups['group'])) {
 
 ?>
-    <div id="section_<?= $type ?>_<?= $group_item; ?>" class="tab-pane<?= $first ?>">
-      <div class="panel panel-primary">
-        <div class="panel-body">
+            <div id="section_<?= $type ?>_<?= $group_item; ?>" class="tab-pane<?= $first ?>">
+              <div class="panel panel-primary">
+                <div class="panel-body">
 <?php
       if ($group_key['count_installed'] > 0) {
 ?>
-          <table class="table table-sm table-striped table-hover" id="table-<?= $type ?>-<?= $group_item ?>">
-            <thead>
-            <tr class="table-info">
-              <th><?= constant('TABLE_HEADING_' . strtoupper($type)) ?></th>
-              <th><?= TABLE_HEADING_DESCRIPTION ?></th>
-              <th class="text-center"><?= TABLE_HEADING_SORT_ORDER ?></th>
-              <th class="text-center"><?= TABLE_HEADING_STATUS ?></th>
-              <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
-            </tr>
-            </thead>
-            <tbody>
+                  <table class="table table-sm table-striped table-hover" id="table-<?= $type ?>-<?= $group_item ?>">
+                    <thead>
+                    <tr class="table-info">
+                      <th><?= constant('TABLE_HEADING_' . strtoupper($type)) ?></th>
+                      <th><?= TABLE_HEADING_DESCRIPTION ?></th>
+                      <th class="text-center"><?= TABLE_HEADING_SORT_ORDER ?></th>
+                      <th class="text-center"><?= TABLE_HEADING_STATUS ?></th>
+                      <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
 <?php
         foreach (${'modules_' . $type}['installed'] as $m ) {
           if($m['group'] == $group_item) {
@@ -370,23 +373,22 @@ fwrite($handle, $data);
 
             if (isset($mInfo) && is_object($mInfo) && ($module->code == $mInfo->code) ) {
   ?>
-            <tr id="<?= $module->code . $type?>" class="clickable table-success<?= $muted ?>">
+                    <tr id="<?= $module->code . $type?>" class="clickable table-success<?= $muted ?>">
 <?php
             } else {
   ?>
-            <tr id="<?=$type . '_' . $module->code?>" class="clickable<?= $muted ?>">
+                    <tr id="<?=$type . '_' . $module->code?>" class="clickable<?= $muted ?>">
 <?php
             }
   ?>
-              <td><?= $module->title ?></td>
-              <td><?= $module->description ?></td>
+                      <td><?= $module->title ?></td>
+                      <td><?= $module->description ?></td>
 <?php
       // sort order for modules:
       // module, old_position, new_position, group
             $button_up ="";
             $button_down ="";
             
-//            if (method_exists($module, "set_sort_order") ) {
             if ($module->sort_order > 1)  {
               $button_up = '<a href="javascript:SortModule(\'' . $module->code . '\',' . ($module->sort_order -1) . ',\'' . $group_item .'\', \'' . $type . '\')"><i class="fa fa-chevron-circle-up fa-lg text-primary"></i></a>';
             } else {
@@ -398,10 +400,9 @@ fwrite($handle, $data);
             } else {
               $button_down = '<i class="fa fa-chevron-circle-down fa-lg text-muted"></i>';
             }
-//            }
 ?>
-              <td class="text-center" nowrap><?= $button_up  . '&nbsp;<span id="sort-' . $module->sort_order . '">' . $module->sort_order . '</span>&nbsp;' . $button_down ?></td>
-              <td id="toggler_<?= $type ?>_<?= $module->code ?>" class="text-center">
+                      <td class="text-center" nowrap><?= $button_up  . '&nbsp;<span id="sort-' . $module->sort_order . '">' . $module->sort_order . '</span>&nbsp;' . $button_down ?></td>
+                      <td id="toggler_<?= $type ?>_<?= $module->code ?>" class="text-center">
 <?php
 /// end sort
 
@@ -411,56 +412,57 @@ fwrite($handle, $data);
 
               if ($module->enabled) {
   ?>
-                    <i class="fas fa-circle fa-lg text-success"></i>&nbsp;&nbsp;<a href="javascript:ToggleModule('<?= $module->code ?>', '<?= $type ?>');" data-toggle="tooltip"><i class="far fa-circle fa-lg text-danger"></i></a>
+                        <i class="fas fa-circle fa-lg text-success"></i>&nbsp;&nbsp;<a href="javascript:ToggleModule('<?= $module->code ?>', '<?= $type ?>');" data-toggle="tooltip"><i class="far fa-circle fa-lg text-danger"></i></a>
 <?php
               } else {
   ?>
-                    <a href="javascript:ToggleModule('<?= $module->code ?>', '<?= $type ?>');" data-toggle="tooltip"><i class="far fa-circle fa-lg text-success"></i></a>&nbsp;&nbsp;<i class="fas fa-circle fa-lg text-danger"></i>
+                        <a href="javascript:ToggleModule('<?= $module->code ?>', '<?= $type ?>');" data-toggle="tooltip"><i class="far fa-circle fa-lg text-success"></i></a>&nbsp;&nbsp;<i class="fas fa-circle fa-lg text-danger"></i>
 <?php
               }
             } else {
           // module cannot be toggled
               if ($module->enabled) {
   ?>
-                    <i class="fas fa-circle fa-lg text-success"></i>
+                        <i class="fas fa-circle fa-lg text-success"></i>
 <?php
               } else {
   ?>
-                    <i class="fas fa-circle fa-lg text-danger"></i>
+                        <i class="fas fa-circle fa-lg text-danger"></i>
 <?php
               }
 
             }
-?>              </td>
-              <td class="actions">
-                <a href="<?=  tep_href_link('modules_pages.php', 'module=' . $module->code . '&action=remove&type=' . $type . '&desired_groups=' . $_GET['desired_groups'])?>" title="<?= IMAGE_MODULE_REMOVE ?>"  data-toggle="tooltip"><i class="fa fa-trash fa-lg text-danger"></i></a>
-              </td>
-            </tr>
+?>
+                      </td>
+                      <td class="actions">
+                        <a href="<?=  tep_href_link('modules_pages.php', 'module=' . $module->code . '&action=remove&type=' . $type . '&desired_groups=' . $_GET['desired_groups'])?>" title="<?= IMAGE_MODULE_REMOVE ?>"  data-toggle="tooltip"><i class="fa fa-trash fa-lg text-danger"></i></a>
+                      </td>
+                    </tr>
 <?php
           }
         }
 ?>
-            </tbody>
-          </table>
+                    </tbody>
+                  </table>
 
 <?php
       } else {
 ?>
-            <div class="alert alert-warning"><?= WARNING_NO_INSTALLED_MODULES ?></div>
+                  <div class="alert alert-warning"><?= WARNING_NO_INSTALLED_MODULES ?></div>
 <?php
       }
 
       if ($group_key['count_uninstalled'] > 0) {
 ?>
-            <table class="table table-sm table-striped table-hover">
-              <thead>
-              <tr class="table-info">
-                <th><?= TABLE_HEADING_MODULES_UNINSTALLED ?></th>
-                <th><?= TABLE_HEADING_DESCRIPTION ?></th>
-                <th class="actions" colspan="3"><?php echo TABLE_HEADING_ACTION ?></th>
-              </tr>
-              </thead>
-              <tbody>
+                  <table class="table table-sm table-striped table-hover">
+                    <thead>
+                    <tr class="table-info">
+                      <th><?= TABLE_HEADING_MODULES_UNINSTALLED ?></th>
+                      <th><?= TABLE_HEADING_DESCRIPTION ?></th>
+                      <th class="actions" colspan="3"><?php echo TABLE_HEADING_ACTION ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
 <?php
         foreach (${'modules_' . $type}['new'] as $m) {
           if($m['group'] == $group_item) {
@@ -478,47 +480,49 @@ fwrite($handle, $data);
             
             if (isset($mInfo) && is_object($mInfo) && ($module->code == $mInfo->code) ) {
 ?>
-              <tr class="clickable table-success">
+                    <tr class="clickable table-success">
 <?php
             } else {
 ?>
-              <tr class="clickable"">
+                    <tr class="clickable"">
 <?php
             }
 ?>
-                <td><?php echo $module->title; ?></td>
-                <td><?php echo $module->description; ?></td>
-                <td class="actions">
-                  <a href="<?= tep_href_link('modules_pages.php',tep_get_all_get_params(array ('action','module')) . 'action=modules_pages_install&module=' . $module->code  . '&type=' . $type)?>" title="<?= IMAGE_MODULE_INSTALL ?>" data-toggle="tooltip"><i class="fa fa-plus-circle fa-lg text-info"></i></a>
-                </td>
-              </tr>
+                      <td><?php echo $module->title; ?></td>
+                      <td><?php echo $module->description; ?></td>
+                      <td class="actions">
+                        <a href="<?= tep_href_link('modules_pages.php',tep_get_all_get_params(array ('action','module')) . 'action=modules_pages_install&module=' . $module->code  . '&type=' . $type)?>" title="<?= IMAGE_MODULE_INSTALL ?>" data-toggle="tooltip"><i class="fa fa-plus-circle fa-lg text-info"></i></a>
+                      </td>
+                    </tr>
 <?php
           }
         }
 ?>
-              </tbody>
-            </table>
+                    </tbody>
+                  </table>
 <?php
       } else {
 ?>
-            <div class="alert alert-warning"><?= WARNING_NO_UNINSTALLED_MODULES ?></div>
+                <div class="alert alert-warning"><?= WARNING_NO_UNINSTALLED_MODULES ?></div>
 <?php
       }
 ?>
-          </div>
-        </div>
-      </div>
+                </div>
+              </div>
+            </div>
 <?php
       $first="";
     }
   }
 ?>
-    </div>
-  </div>
+          </div>
+        </div>
 <?php
   } // end foreach type
 ?>
-</div>
+      </div>
+    </div>
+  </div>
 <?php
 
     function _sortModulesInstalled($a, $b) {
