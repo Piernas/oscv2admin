@@ -18,6 +18,9 @@
 
       $this->buttons_modules_class = array();
       foreach (glob(DIR_FS_CATALOG . "includes/pages/buttons/" . $this->group . "/*.php") as $filename) {
+        if ( file_exists(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/buttons/' . $group . '/' . basename ($filename) )) {
+          include(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/buttons/' . $group . '/' . basename ($filename));
+        }
         $this->buttons_modules_class[] = basename ($filename, ".php");
       }
     }

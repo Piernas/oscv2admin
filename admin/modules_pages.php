@@ -71,18 +71,41 @@
                   $class = substr($file, 0, strrpos($file, '.'));
 
                   if (!tep_class_exists($class)) {
-//                      echo DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file ;
                     if ( file_exists(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file )) {
                       include(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file);
                     } else {
-                      // DEBUG - to be dremoved
-//                      echo "NO EXISTE" . DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file . "<br>";
+// DEBUG - to be removed
+                      echo "NO EXISTE" . DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file . "<br>";
                     }
+//
                     include(DIR_FS_CATALOG . 'includes/pages/' . $type . '/' . $group . '/' . $file);
                   }
 
                   if (tep_class_exists($class)) {
                     $module = new $class();
+
+/////////////////////
+// CREATE LANG FILE - REMOVE FOR PRODUCTION
+/*
+if (!file_exists(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group)) {
+    mkdir(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group, 0777, true);
+}
+
+if ( !file_exists(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file )) {
+   
+$my_file = DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file;
+$handle = fopen($my_file, 'w') or die('Cannot open file:  '.$my_file);
+$data = "<?php
+define ('" . $module->cfg_key . 'TITLE' . "','');
+define ('" . $module->cfg_key . 'DESCRIPTION' . "','');
+
+";
+fwrite($handle, $data);
+
+}
+*/
+/////////////////////
+
                     if (in_array($group . '/' . $class, ${'modules_' . $type . '_installed'})) {
 
                     ${'modules_' . $type}['installed'][] = array('code' => $class,
