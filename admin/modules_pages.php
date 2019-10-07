@@ -74,9 +74,10 @@
                     if ( file_exists(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file )) {
                       include(DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file);
                     } else {
-// DEBUG - to be dremoved
+// DEBUG - to be removed
                       echo "NO EXISTE" . DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file . "<br>";
-//                    }
+                    }
+//
                     include(DIR_FS_CATALOG . 'includes/pages/' . $type . '/' . $group . '/' . $file);
                   }
 
