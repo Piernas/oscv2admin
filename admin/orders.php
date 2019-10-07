@@ -93,51 +93,51 @@
   $oscTemplate->addBlock('<script>' . $orders_modules->get_javascript() . '</script>', 'admin_footer_scripts');
 
 ?>
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="d-flex justify-content-between">
+        <div class="mr-auto pageHeading"><i class="fas fa-file-invoice fa-lg"></i> <?= HEADING_TITLE ?></div>
+        <div class="pr-2">
+          <?= tep_draw_form('orders', basename($PHP_SELF),"" ,"get" ,'class="form-inline"') ?>
 
-  <div class="d-flex justify-content-between">
-    <div class="mr-auto p-2 pageHeading"><i class="fas fa-file-invoice fa-lg"></i> <?= HEADING_TITLE ?></div>
-    <div class="py-2 pr-2">
-      <?= tep_draw_form('orders', basename($PHP_SELF),"" ,"get" ,'class="form-inline"') ?>
+            <div class="form-group form-group-sm">
+              <?= tep_draw_input_field('oID', null, ' size="12" placeholder="' . HEADING_TITLE_SEARCH . '"') ?>
 
-        <div class="form-group form-group-sm">
-          <?= tep_draw_input_field('oID', null, ' size="12" placeholder="' . HEADING_TITLE_SEARCH . '"') ?>
+              <?= tep_draw_hidden_field('action', 'edit'); ?>
 
-          <?= tep_draw_hidden_field('action', 'edit'); ?>
+              <div class="input-group-append"><button class="btn btn-sm btn-info" type="submit"><i class="fas fa-search"></i></button></div>
+            </div>
+            <?= tep_hide_session_id() ?>
 
-          <div class="input-group-append"><button class="btn btn-sm btn-info" type="submit"><i class="fas fa-search"></i></button></div>
+          </form>
         </div>
-        <?= tep_hide_session_id() ?>
 
-      </form>
-    </div>
-
-    <div class="py-2 pr-2">
-      <?= tep_draw_form('status', basename($PHP_SELF),"" ,"get", 'class="form-inline"') ?>
-      <div class="input-group input-group-sm">
-        <div class="input-group-prepend">
-        <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
+        <div class="pr-2">
+          <?= tep_draw_form('status', basename($PHP_SELF),"" ,"get", 'class="form-inline"') ?>
+          <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+            <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
+            </div>
+            <?= tep_draw_pull_down_menu('status', array_merge(array(array('id' => '', 'text' => TEXT_ALL_ORDERS)), $orders_statuses), '', 'onchange="this.form.submit();"') ?>
+            <?= tep_hide_session_id() ?>
+          </div>
+          </form>
         </div>
-        <?= tep_draw_pull_down_menu('status', array_merge(array(array('id' => '', 'text' => TEXT_ALL_ORDERS)), $orders_statuses), '', 'onchange="this.form.submit();"') ?>
-        <?= tep_hide_session_id() ?>
+        <div>
+          <a href="<?= tep_href_link('modules_pages.php?desired_groups=' . urlencode (json_encode(array(array('orders'), array('orders'))))) ?>" class="btn btn-info btn-sm"><i class="fas fa-cog"></i></a>
+
+        </div>
       </div>
-      </form>
     </div>
-    <div class="py-2">
-      <a href="<?= tep_href_link('modules_pages.php?desired_groups=' . urlencode (json_encode(array(array('orders'), array('orders'))))) ?>" class="btn btn-info btn-sm"><i class="fas fa-cog"></i></a>
-
-    </div>
-  </div>
-
-    <table class="table table-striped table-sm">
-    <thead>
-      <tr class="table-info">
-<?php
-      echo $orders_modules->get_table_header ();
-?>
-        <th class="actions"><?= TABLE_HEADING_ACTION ?>&nbsp;</th>
-      </tr>
-    </thead>
-    <tbody>
+    <div class="card-body" id="page-content">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr class="table-info">
+            <?= $orders_modules->get_table_header () ?>
+            <th class="actions"><?= TABLE_HEADING_ACTION ?>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
 <?php
     if (isset($_GET['status']) && is_numeric($_GET['status']) && ($_GET['status'] > 0)) {
       $status = tep_db_prepare_input($_GET['status']);
@@ -150,59 +150,30 @@
     $orders_query = tep_db_query($orders_query_raw);
     while ($orders = tep_db_fetch_array($orders_query)) {
 
-  /*
-    if ((!isset($_GET['oID']) || (isset($_GET['oID']) && ($_GET['oID'] == $orders['orders_id']))) && !isset($oInfo)) {
-        $oInfo = new objectInfo($orders);
-    }
-*/
     $order = new order ($orders['orders_id']);
 
 ?>
-<tr class="clickable">
-<?php
-    // Buttons:
-//    print_r($order);
-?>
+        <tr class="clickable">
+          <?= $orders_modules->get_table_row ($order->info['orders_id']) ?>
 
-        <?= $orders_modules->get_table_row ($order->info['orders_id']) ?>
-
-        <td class="actions text-nowrap">
-<?= $orders_modules->get_action_buttons($order->info['orders_id']); ?>
-        </td>
-      </tr>
+          <td class="actions text-nowrap">
+            <?= $orders_modules->get_action_buttons($order->info['orders_id']); ?>
+          </td>
+        </tr>
 <?php
     }
 ?>
-    </table>
-
-    <div class="row py-3">
-      <div class="col-6"><?= $orders_split->display_count($orders_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_ORDERS); ?></div>
-      <div class="col-6"><?= $orders_split->display_links($orders_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], tep_get_all_get_params(array('page', 'oID', 'action'))) ?></div>
+      </table>
     </div>
+    <div class="card-footer">
+      <div class="row">
+        <div class="col-6"><?= $orders_split->display_count($orders_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_ORDERS); ?></div>
+        <div class="col-6"><?= $orders_split->display_links($orders_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], tep_get_all_get_params(array('page', 'oID', 'action'))) ?></div>
+      </div>
+    </div>
+  </div>
 
 <?php
-
-  $heading = array();
-  $contents = array();
-
-  switch ($action) {
-    case 'delete':
-      $heading[] = array('text' => '<strong>' . TEXT_INFO_HEADING_DELETE_ORDER . '</strong>');
-
-      $contents = array('form' => tep_draw_form('orders', 'orders.php', tep_get_all_get_params(array('oID', 'action')) . 'oID=' . $oInfo->orders_id . '&action=orders_delete_confirm'));
-      $contents[] = array('text' => TEXT_INFO_DELETE_INTRO . '<br /><br /><strong>' . $cInfo->customers_firstname . ' ' . $cInfo->customers_lastname . '</strong>');
-      $contents[] = array('text' => '<br />' . tep_draw_checkbox_field('restock') . ' ' . TEXT_INFO_RESTOCK_PRODUCT_QUANTITY);
-      $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(IMAGE_DELETE, 'trash', null, 'primary') . tep_draw_button(IMAGE_CANCEL, 'close', tep_href_link('orders.php', tep_get_all_get_params(array('oID', 'action')) . 'oID=' . $oInfo->orders_id)));
-      break;
-    default:
-      if (isset($oInfo) && is_object($oInfo)) {
-
-      }
-      break;
-  }
-
-
-
   require('includes/template_bottom.php');
   require('includes/application_bottom.php');
 ?>
