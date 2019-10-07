@@ -84,6 +84,8 @@
     </div>
   </div>
 
+  <div class="card">
+    <div class="card-body">
 
 <?php
 
@@ -103,6 +105,7 @@
   if ($num_categories > 0){
 ?>
     <!-- categories table begins -->
+
     <table class="table table-sm table-striped table-hover" id="categories-table">
       <thead>
       <tr class="table-info">
@@ -321,6 +324,8 @@
       }
 ?>
             </div>
+          </div>
+          </div>
           </div>
 
 <?php
