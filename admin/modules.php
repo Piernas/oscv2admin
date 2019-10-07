@@ -11,11 +11,11 @@
 */
 
   require('includes/application_top.php');
-  define ('OSCOM_DEVELOP_SHOW_CONSTANTS', true);// TODO: move to configuration
-    $action = (isset($_GET['action']) ? $_GET['action'] : '');
+//  define ('OSCOM_DEVELOP_SHOW_CONSTANTS', true);// TODO: move to configuration
+  $action = (isset($_GET['action']) ? $_GET['action'] : '');
 
- if(!$action)  {
-   require('includes/template_top.php');// moved to avoid problems with template modules
+  if(!$action)  {
+    require('includes/template_top.php');// moved to avoid problems with template modules
   }
 
   $set = (isset($_GET['set']) ? $_GET['set'] : '');
@@ -141,11 +141,7 @@
         if (isset($mInfo->api_version)) {
           echo '<i class="fas fa-info-circle fa-lg text-info"></i>&nbsp;<strong>' . TEXT_INFO_API_VERSION . '</strong> ' . $mInfo->api_version . '<br>';
         }
-/*
-        if (isset($mInfo->author)) {
-          echo '<i class="fas fa-info-circle fa-lg text-info"></i>&nbsp;<strong>' . TEXT_INFO_AUTHOR . '</strong> ' . $mInfo->author . '<br>';
-        }
-*/
+
         echo '</span>';
 
         exit();
@@ -284,56 +280,63 @@
     $groupss[] = array ('id'=>$modules_group['code'], 'text' =>$modules_group['title']);
   }
 ?>
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="d-flex justify-content-between">
+        <div class="mr-auto p-2 pageHeading"><i class="fas fa-cogs"></i> <?= HEADING_TITLE . $cfgModules->get($set, 'title')?></div>
+        <div class="p-2 pageHeading">
+          <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+              <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
+              <?= tep_draw_pull_down_menu('module_group_selection', $groupss, $set, $parameters = '')?>
+            </div>
 
-   <div class="d-flex justify-content-between">
-
-    <div class="mr-auto p-2 pageHeading"><i class="fas fa-cogs"></i> <?= HEADING_TITLE . $cfgModules->get($set, 'title')?></div>
-    <div class="p-2 pageHeading">
-      <div class="input-group input-group-sm">
-        <div class="input-group-prepend">
-        <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
-        </div><?= tep_draw_pull_down_menu('module_group_selection', $groupss, $set, $parameters = '')?></div>
+          </div>
+        </div>
       </div>
-  </div>
+    </div>
+    <div class="card-body" id="page-content">
 <?php
 
     if(array_key_exists('installed', $modules)){
 ?>
-  <table class="table table-striped table-sm table-hover">
-    <thead>
-    <tr class="table-info">
+    <table class="table table-striped table-sm table-hover">
+      <thead>
+      <tr class="table-info">
 <?php
   if ($set == 'shipping') {
 ?>
-    <th class="text-center">*Icon*</th>
+        <th class="text-center">*Icon*</th>
 <?php
   }
+/*
   if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) {
 ?>
-    <th class="d-none d-sm-table-cell"><?= TABLE_HEADING_CLASS ?></th>
+        <th class="d-none d-sm-table-cell"><?= TABLE_HEADING_CLASS ?></th>
 <?php
   }
+*/
 ?>
-    <th><?= TABLE_HEADING_MODULES; ?></th>
+        <th><?= TABLE_HEADING_MODULES; ?></th>
 <?php
   if ($set == 'boxes') {
 ?>
-    <th class="text-center"><?= TABLE_HEADING_COLUMN ?></th>
+        <th class="text-center"><?= TABLE_HEADING_COLUMN ?></th>
 <?php
   }
   if ($set == 'shipping') {
 ?>
-    <th class="text-center">*Zona*</th>
+        <th class="text-center">*Zona*</th>
 <?php
   }
 
 ?>
-    <th class="text-center"><?= TABLE_HEADING_SORT_ORDER; ?></th>
-    <th class="text-center"><?= TABLE_HEADING_ENABLE; ?></th>
-    <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
-  </tr>
-  </thead>
-  <tbody>
+        <th class="text-center"><?= TABLE_HEADING_SORT_ORDER; ?></th>
+        <th class="text-center"><?= TABLE_HEADING_ENABLE; ?></th>
+        <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
+      </tr>
+      </thead>
+      <tbody>
 <?php
   $installed_modules = array();
   $group_installed_position ="";
@@ -357,22 +360,23 @@
         }
       }
 ?>
-    <tr class="clickable">
+        <tr class="clickable">
 <?php
       if ($set =='shipping') {
-        //       <td><?=  $module->icon ? '<img src="' .tep_catalog_href_link ($module->icon) . '" height="30" width="60">':""; 
+        //       <td><?=  $module->icon ? '<img src="' .tep_catalog_href_link ($module->icon) . '" height="30" width="60">':"";
 ?>
-      <td><?=  $module->icon ? tep_image(tep_catalog_href_link ($module->icon)) :""; ?></td>
+          <td><?=  $module->icon ? tep_image(tep_catalog_href_link ($module->icon)) :""; ?></td>
 <?php
       }
-
+/*
       if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) {
 ?>
-      <td class="d-none d-sm-table-cell"><small><?= $module->code; ?></small></td>
+          <td class="d-none d-sm-table-cell"><small><?= $module->code; ?></small></td>
 <?php
       }
+*/
 ?>
-      <td><?= $module->title ?></td>
+          <td><?= $module->title ?></td>
 <?php
     // columna
       if ($set == 'boxes') {
@@ -381,13 +385,13 @@
           $column = " fa-rotate-180";
         }
 ?>
-    <td class="text-center"><a href="<?= tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $module->code . '&action=swap_column') ?>"><i class="fas fa-toggle-on fa-lg text-primary<?= $column ?>"></i></a></td>
+          <td class="text-center"><a href="<?= tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $module->code . '&action=swap_column') ?>"><i class="fas fa-toggle-on fa-lg text-primary<?= $column ?>"></i></a></td>
 <?php
       }
 
   if ($set == 'shipping') {
 ?>
-    <td class="text-center"><?= (isset($module->zone) ? tep_get_geo_zone_name($module->zone) : "-"); ?></td>
+          <td class="text-center"><?= (isset($module->zone) ? tep_get_geo_zone_name($module->zone) : "-"); ?></td>
 <?php
   }
 
@@ -417,8 +421,8 @@
         }
       }
 ?>
-      <td class="text-center" nowrap><?= $button_up .  " " . $sort_order . " " . $button_down;?></td>
-      <td class="text-center"><?php
+          <td class="text-center" nowrap><?= $button_up .  " " . $sort_order . " " . $button_down;?></td>
+          <td class="text-center"><?php
 
       if ($module->check()) {
         $status_constant = module_get_common_prefix ($module->keys()) . 'STATUS';
@@ -433,8 +437,8 @@
       }
 
 ?></td>
-      <td class="actions text-nowrap">
-        <a href="javascript:ModalInfo('<?=$class ?>');"><i class="fas fa-info-circle fa-lg text-info"></i></a>
+          <td class="actions text-nowrap">
+            <a href="javascript:ModalInfo('<?=$class ?>');"><i class="fas fa-info-circle fa-lg text-info"></i></a>
 <?php
       // Remove general setup options already available on main page:
         $module_keys =$module->keys();
@@ -445,17 +449,17 @@
 
         if (sizeof($module_keys)) {
 ?>
-        <a href="javascript:ModalEdit('<?=$class ?>');"><i class="fas fa-cog fa-lg text-primary"></i></a>
+            <a href="javascript:ModalEdit('<?=$class ?>');"><i class="fas fa-cog fa-lg text-primary"></i></a>
 <?php
         } else {
 ?>
-        <i class="fas fa-cog fa-lg text-muted"></i>
+            <i class="fas fa-cog fa-lg text-muted"></i>
 <?php
         }
 ?>
-        <a href="<?= tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $class . '&action=remove')?>"><i class="fas fa-trash fa-lg text-danger"></i></a>
-      </td>
-    </tr>
+            <a href="<?= tep_href_link(basename(__FILE__), 'set=' . $set . '&module=' . $class . '&action=remove')?>"><i class="fas fa-trash fa-lg text-danger"></i></a>
+          </td>
+        </tr>
 <?php
     }
   }
@@ -487,20 +491,20 @@
     }
 
 ?>
-  </tbody>
+      </tbody>
   <?php
          $colspan =5;
-        if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) $colspan++;
+//        if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) $colspan++;
         if ($set =='shipping')  $colspan++;
 
 
   ?>
-  <tfoot>
-    <tr>
-      <td colspan="<?= $colspan?>" class="table-info smallText"><?= TEXT_MODULE_DIRECTORY . ' ' . $module_directory; ?></td>
-    </tr>
-    </tfoot>
-  </table>
+      <tfoot>
+      <tr>
+        <td colspan="<?= $colspan?>" class="table-info smallText"><?= TEXT_MODULE_DIRECTORY . ' ' . $module_directory; ?></td>
+      </tr>
+      </tfoot>
+    </table>
   <?php
   } else{
   // New Modules available for install
@@ -511,21 +515,22 @@
 if (isset ($modules['new']))  {
   $num_uninstalled = sizeof($modules['new']);
 ?>
-  <table class="table table-striped table-sm table-hover">
-    <thead>
+    <table class="table table-striped table-sm table-hover">
+      <thead>
       <tr class="table-info">
 <?php
         if ($set =='shipping') {
 ?>
-        <th></th>
+          <th></th>
 <?php
         }
-      
+/*
   if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) {
 ?>
-    <th class="d-none d-sm-table-cell"><?= TABLE_HEADING_CLASS ?></th>
+        <th class="d-none d-sm-table-cell"><?= TABLE_HEADING_CLASS ?></th>
 <?php
   }
+  */
           if ($set =='shipping')  $colspan++;
 
 ?>
@@ -533,7 +538,7 @@ if (isset ($modules['new']))  {
         <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
       </tr>
       </thead>
-    <tbody>
+      <tbody>
  <?php
     foreach ( $modules['new'] as $m ) { // itera los módulos no instalados
       $module = new $m['code']();
@@ -541,51 +546,56 @@ if (isset ($modules['new']))  {
       $description = preg_replace('(<div\s+class="secWarning">.*?<\/div>)', '', $m['description']);
       preg_match('(<div\s+class="secWarning">.*?<\/div>)', $m['description'], $warning);
 ?>
-    <tr class="clickable">
+      <tr class="clickable">
 <?php
       if ($set =='shipping') {
 ?>
-      <td><?=  $module->icon ? tep_image(tep_catalog_href_link ($module->icon)) :""; ?></td>
+        <td><?=  $module->icon ? tep_image(tep_catalog_href_link ($module->icon)) :""; ?></td>
 <?php
 
-      } 
+      }
+/*
       if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) {
 ?>
-      <td class="hidden-xs"><small><?= $module->code; ?></small></td>
+        <td class="hidden-xs"><small><?= $module->code; ?></small></td>
 
 <?php
       }
+*/
 ?>
-      <td><?= $m['title']; ?></td>
-      <td><div><?= $description;?></div></td>
-      <td class="actions text-nowrap"><?= $buttons; ?></td>
-    </tr>
+        <td><?= $m['title']; ?></td>
+        <td><div><?= $description;?></div></td>
+        <td class="actions text-nowrap"><?= $buttons; ?></td>
+      </tr>
 <?php
       unset ($module);
     }
 ?>
-    </tbody>
+      </tbody>
   <?php
     $colspan=3;
-    if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) $colspan++;
+//    if (OSCOM_DEVELOP_SHOW_CONSTANTS =='True' ) $colspan++;
     if ($set =='shipping') $colspan++;
 
   ?>
-    <tfoot>
-    <tr class="table-info">
+      <tfoot>
+      <tr class="table-info">
 
-      <td colspan="<?= $colspan ?>" class="text-center"><?= ($num_uninstalled > 0 ?  MODULES_AVAILABLE . $num_uninstalled : NO_MODULES_AVAILABLE) ?></td>
-    </tr>
-    </tfoot>
-  </table>
+        <td colspan="<?= $colspan ?>" class="text-center"><?= ($num_uninstalled > 0 ?  MODULES_AVAILABLE . $num_uninstalled : NO_MODULES_AVAILABLE) ?></td>
+      </tr>
+      </tfoot>
+    </table>
 
 <?php
   } else {
 ?>
-    <div class="col-sm-12 text-center bg-info"><?= TABLE_HEADING_NO_INSTALLABLE_MODULES ?></div>
+      <div class="col-sm-12 text-center bg-info"><?= TABLE_HEADING_NO_INSTALLABLE_MODULES ?></div>
 <?php
   }
-
+?>
+    </div>
+  </div>
+<?php
   function module_get_common_prefix ($prefix_array){
     sort($prefix_array);
     $s1 = $prefix_array[0];
