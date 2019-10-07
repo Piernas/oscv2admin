@@ -14,49 +14,46 @@
 
   $action = (isset($_GET['action']) ? $_GET['action'] : '');
 
-  if (tep_not_null($action)) {
-    switch ($action) {
-      case 'save':
-        $configuration_value = tep_db_prepare_input($_POST['configuration_value']);
-        $cID = tep_db_prepare_input($_GET['cID']);
-
-        tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . tep_db_input($configuration_value) . "', last_modified = now() where configuration_id = '" . (int)$cID . "'");
-
-        tep_redirect(tep_href_link('configuration.php', 'gID=' . $_GET['gID'] . '&cID=' . $cID));
-        break;
-    }
-  }
-
   $gID = (isset($_GET['gID'])) ? $_GET['gID'] : 1;
 
   $cfg_group_query = tep_db_query("select configuration_group_title from " . TABLE_CONFIGURATION_GROUP . " where configuration_group_id = '" . (int)$gID . "'");
   $cfg_group = tep_db_fetch_array($cfg_group_query);
 
   require('includes/template_top.php');
-?>
+  
+  $groups_list = $cfgGroups->getValues ();
 
-    <table border="0" width="100%" cellspacing="0" cellpadding="2">
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td class="pageHeading"><?php echo $cfg_group['configuration_group_title']; ?></td>
-            <td class="pageHeading" align="right"><?php echo tep_draw_separator('pixel_trans.gif', HEADING_IMAGE_WIDTH, HEADING_IMAGE_HEIGHT); ?></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td valign="top"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-              <tr class="dataTableHeadingRow">
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_CONFIGURATION_TITLE; ?></td>
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_CONFIGURATION_VALUE; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</td>
-              </tr>
+?>
+  <div class="d-flex justify-content-between">
+    <div class="mr-auto p-2 pageHeading">
+      <?php echo sprintf(TITLE_CONFIGURATION ,$cfg_group['configuration_group_title']); ?>
+    </div>
+    <div class="py-2 pr-2">
+          <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+              <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
+            </div>
+      <?= tep_draw_pull_down_menu('configuration_group_selection', $groups_list, $gID)?>
+      </div>
+    </div>
+    <div class="py-2">
+      <a class="btn btn-info btn-sm" href="javascript:DisplaySetup();"><i class="fas fa-cog"></i></a>
+    </div>
+  </div>
+  <table class="table table-sm table-striped table-hover">
+    <thead>
+    <tr class="table-info">
+      <th><?php echo TABLE_HEADING_CONFIGURATION_CONSTANT; ?></th>
+      <th><?php echo TABLE_HEADING_CONFIGURATION_TITLE; ?></th>
+      <th><?php echo TABLE_HEADING_CONFIGURATION_DESCRIPTION; ?></th>
+      <th class="text-center"><?php echo TABLE_HEADING_CONFIGURATION_VALUE; ?></th>
+      <th class="actions"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
 <?php
-  $configuration_query = tep_db_query("select configuration_id, configuration_title, configuration_value, use_function from " . TABLE_CONFIGURATION . " where configuration_group_id = '" . (int)$gID . "' order by sort_order");
+  $configuration_query = tep_db_query("select configuration_id, configuration_key, configuration_title, configuration_description, configuration_value, use_function from " . TABLE_CONFIGURATION . " where configuration_group_id = '" . (int)$gID . "' order by sort_order");
   while ($configuration = tep_db_fetch_array($configuration_query)) {
-    $cfgValue = 0; 
     if (tep_not_null($configuration['use_function'])) {
       $use_function = $configuration['use_function'];
       if (preg_match('/->/', $use_function)) {
@@ -67,82 +64,122 @@
         }
         $cfgValue = tep_call_function($class_method[1], $configuration['configuration_value'], ${$class_method[0]});
       } else {
-        if (function_exists($use_function)) { 
-           $cfgValue = tep_call_function($use_function, $configuration['configuration_value']);
-        }
+        $cfgValue = tep_call_function($use_function, $configuration['configuration_value']);
       }
     } else {
       $cfgValue = $configuration['configuration_value'];
     }
+
+    $cfgValue = htmlspecialchars($cfgValue);
     
-    if ((!isset($_GET['cID']) || (isset($_GET['cID']) && ($_GET['cID'] == $configuration['configuration_id']))) && !isset($cInfo) && (substr($action, 0, 3) != 'new')) {
-      $cfg_extra_query = tep_db_query("select configuration_key, configuration_description, date_added, last_modified, use_function, set_function from " . TABLE_CONFIGURATION . " where configuration_id = '" . (int)$configuration['configuration_id'] . "'");
-      $cfg_extra = tep_db_fetch_array($cfg_extra_query);
-
-      $cInfo_array = array_merge($configuration, $cfg_extra);
-      $cInfo = new objectInfo($cInfo_array);
-    }
-
-    if ( (isset($cInfo) && is_object($cInfo)) && ($configuration['configuration_id'] == $cInfo->configuration_id) ) {
-      echo '                  <tr id="defaultSelected" class="dataTableRowSelected" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('configuration.php', 'gID=' . $_GET['gID'] . '&cID=' . $cInfo->configuration_id . '&action=edit') . '\'">' . "\n";
-    } else {
-      echo '                  <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('configuration.php', 'gID=' . $_GET['gID'] . '&cID=' . $configuration['configuration_id']) . '\'">' . "\n";
+    if (strtolower ($cfgValue) == 'true') {
+      $cfgValue = '<i class="fa fa-check fa-lg text-success"></i>';
+    } elseif (strtolower($cfgValue) == 'false') {
+      $cfgValue = '<i class="fas fa-times fa-lg text-danger"></i>';
     }
 ?>
-                <td class="dataTableContent"><?php echo $configuration['configuration_title']; ?></td>
-                <td class="dataTableContent"><?php echo htmlspecialchars($cfgValue); ?></td>
-                <td class="dataTableContent" align="right"><?php if ( (isset($cInfo) && is_object($cInfo)) && ($configuration['configuration_id'] == $cInfo->configuration_id) ) { echo tep_image('images/icon_arrow_right.gif', ''); } else { echo '<a href="' . tep_href_link('configuration.php', 'gID=' . $_GET['gID'] . '&cID=' . $configuration['configuration_id']) . '">' . tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '</a>'; } ?>&nbsp;</td>
-              </tr>
+    <tr>
+      <td><?php echo $configuration['configuration_key']; ?></td>
+      <td><?php echo $configuration['configuration_title']; ?></td>
+      <td><?= $configuration['configuration_description'] ?></td>
+      <td class="text-center" id="val_<?= $configuration['configuration_id'] ?>"><?= $cfgValue ?></td>
+      <td class="actions"><a href="javascript:ModalEdit(<?= $configuration['configuration_id'] ?>);"><i class="fas fa-edit fa-lg text-primary"></i></a></td>
+    </tr>
 <?php
   }
 ?>
-            </table></td>
+    <tbody>
+  </table>
 <?php
-  $heading = array();
-  $contents = array();
 
-  switch ($action) {
-    case 'edit':
-      $heading[] = array('text' => '<strong>' . $cInfo->configuration_title . '</strong>');
+  require ("includes/classes/modal.php");
+  
+  $modal = new modal();
+  $modal->button_save = true;
+  $modal->button_cancel = true;
+  $modal->output();
 
-      if ($cInfo->set_function) {
-        eval('$value_field = ' . $cInfo->set_function . '"' . htmlspecialchars($cInfo->configuration_value) . '");');
-      } else {
-        $value_field = tep_draw_input_field('configuration_value', $cInfo->configuration_value);
-      }
-
-      $contents = array('form' => tep_draw_form('configuration', 'configuration.php', 'gID=' . $_GET['gID'] . '&cID=' . $cInfo->configuration_id . '&action=save'));
-      $contents[] = array('text' => TEXT_INFO_EDIT_INTRO);
-      $contents[] = array('text' => '<br /><strong>' . $cInfo->configuration_title . '</strong><br />' . $cInfo->configuration_description . '<br />' . $value_field);
-      $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(IMAGE_SAVE, 'disk', null, 'primary') . tep_draw_button(IMAGE_CANCEL, 'close', tep_href_link('configuration.php', 'gID=' . $_GET['gID'] . '&cID=' . $cInfo->configuration_id)));
-      break;
-    default:
-      if (isset($cInfo) && is_object($cInfo)) {
-        $heading[] = array('text' => '<strong>' . $cInfo->configuration_title . '</strong>');
-
-        $contents[] = array('align' => 'center', 'text' => tep_draw_button(IMAGE_EDIT, 'document', tep_href_link('configuration.php', 'gID=' . $_GET['gID'] . '&cID=' . $cInfo->configuration_id . '&action=edit')));
-        $contents[] = array('text' => '<br />' . $cInfo->configuration_description);
-        $contents[] = array('text' => '<br />' . TEXT_INFO_DATE_ADDED . ' ' . tep_date_short($cInfo->date_added));
-        if (tep_not_null($cInfo->last_modified)) $contents[] = array('text' => TEXT_INFO_LAST_MODIFIED . ' ' . tep_date_short($cInfo->last_modified));
-      }
-      break;
-  }
-
-  if ( (tep_not_null($heading)) && (tep_not_null($contents)) ) {
-    echo '            <td width="25%" valign="top">' . "\n";
-
-    $box = new box;
-    echo $box->infoBox($heading, $contents);
-
-    echo '            </td>' . "\n";
-  }
-?>
-          </tr>
-        </table></td>
-      </tr>
-    </table>
-
-<?php
   require('includes/template_bottom.php');
-  require('includes/application_bottom.php');
 ?>
+<script>
+    $(function(){
+      $('select[name="configuration_group_selection"]').on('change', function () {
+          var url = "configuration.php?gID=" + $(this).val();
+          if (url) {
+              window.location = url;
+          }
+          return false;
+      });
+    });
+</script>
+<script>
+
+  $("#ModalButtonSave").click(function() {
+      if ($("[name='configuration_value']").is(':radio')) {
+        var value =  ($("[name='configuration_value']:checked").val()); 
+      } else {
+        var value = ($('[name="configuration_value"]').val());
+      }
+    
+      var ConfigId = ($('input[name="cID"').val());
+      
+      var params = {"cID" : ConfigId, "configuration_value" : value};
+      $.ajax({
+        data:  params,
+        url:   'configuration.php?action=configuration_save_value',
+        type:  'post',
+        beforeSend: function () {
+          $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+        },
+        success:  function (response) {
+          $("#val_" + ConfigId).fadeOut(function(){
+            $(this).html($(response).filter('#content').html()).fadeIn();
+          });
+
+
+        }
+      });
+  })
+
+  function ModalEdit(ConfigId) {
+    var params = {"cID" : ConfigId, "action" : "configuration_edit_value"};
+/*
+  $("form > .modal-content").unwrap();
+  $(".modal-content").wrap('<form id="configuration_form" name="configuration_form" action="configuration.php?action=configuration_edit_value" method="get">')
+*/
+    
+    $.ajax({
+      data:  params,
+      url:   'configuration.php',
+      type:  'get',
+      beforeSend: function () {
+        $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+      },
+      success:  function (response) {
+        $(".modal-title").html($(response).filter('#title').html());
+        $(".modal-body").html($(response).filter('#content').html());
+        $("#configurationModal").modal('show')
+      }
+    });
+  }
+  
+  function DisplaySetup() {
+    var params = {"action" : "configuration_page_setup"};
+    $.ajax({
+      data:  params,
+      url:   'configuration.php',
+      type:  'get',
+      beforeSend: function () {
+        $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+      },
+      success:  function (response) {
+        $(".modal-title").html($(response).filter('#title').html());
+        $(".modal-body").html($(response).filter('#content').html());
+        $("#configurationModal").modal('show')
+      }
+    });
+  }
+</script>
+
+<?php
+  require('includes/application_bottom.php');
