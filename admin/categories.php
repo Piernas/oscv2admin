@@ -41,6 +41,9 @@
   }
 
 ?>
+  <div class="card my-3">
+      <div class="card-header" id="page-heading">
+
   <div class="d-flex justify-content-between">
 <?php
     if (isset($_GET['search'])) {
@@ -84,8 +87,9 @@
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-body">
+  </div>
+
+    <div class="card-body" id="page-content">
 
 <?php
 
