@@ -13,11 +13,8 @@
       $this->group = basename(dirname(__FILE__));
       $this->cfg_key = 'ADMIN_PAGES_BUTTON_' . strtoupper($this->code) . '_';
       $this->javascript = $this->get_javascript();
-
-      
-      // Localize:
-      $this->title = 'Delete';
-      $this->description = 'Deletes the language\'s data';
+      $this->title = constant($this->cfg_key . 'TITLE');
+      $this->description = constant($this->cfg_key . 'DESCRIPTION');
       
       if ( defined($this->cfg_key . 'STATUS')) {
         $this->enabled = (constant($this->cfg_key . 'STATUS') == 'True');

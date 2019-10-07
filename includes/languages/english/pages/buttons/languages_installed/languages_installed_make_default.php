@@ -1,0 +1,4 @@
+<?php
+define ('ADMIN_PAGES_BUTTON_LANGUAGES_INSTALLED_MAKE_DEFAULT_TITLE','Make default');
+define ('ADMIN_PAGES_BUTTON_LANGUAGES_INSTALLED_MAKE_DEFAULT_DESCRIPTION','Makes this language the default one');
+

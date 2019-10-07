@@ -12,8 +12,8 @@
       $this->code = get_class($this);
       $this->group = basename(dirname(__FILE__));
       $this->cfg_key = 'ADMIN_PAGES_COLUMN_' . strtoupper($this->code) . '_';
-      $this->title = 'Directory'; // $this->cfg_key . 'NAME'
-      $this->description = 'Shows languages Directory'; // $this->cfg_key . 'DESCRIPTION'
+      $this->title = constant($this->cfg_key . 'TITLE');
+      $this->description = constant($this->cfg_key . 'DESCRIPTION');
 
       
       if ( defined($this->cfg_key . 'STATUS')) {
