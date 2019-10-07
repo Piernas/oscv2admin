@@ -333,13 +333,6 @@ if (isset ($product->products_images)) {
 
 
 <?php
-
-echo "<div><pre>";
-print_r ($product);
-echo "</pre></div>";
-
-
-
   require('includes/template_bottom.php');
   require('includes/application_bottom.php');
 ?>
