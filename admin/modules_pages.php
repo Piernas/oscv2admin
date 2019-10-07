@@ -76,7 +76,7 @@
                     } else {
 // DEBUG - to be dremoved
                       echo "NO EXISTE" . DIR_FS_CATALOG_LANGUAGES . $language . '/pages/' . $type . '/' . $group . '/' . $file . "<br>";
-                    }
+//                    }
                     include(DIR_FS_CATALOG . 'includes/pages/' . $type . '/' . $group . '/' . $file);
                   }
 
