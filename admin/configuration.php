@@ -24,33 +24,38 @@
   $groups_list = $cfgGroups->getValues ();
 
 ?>
-  <div class="d-flex justify-content-between">
-    <div class="mr-auto p-2 pageHeading">
-      <?php echo sprintf(TITLE_CONFIGURATION ,$cfg_group['configuration_group_title']); ?>
-    </div>
-    <div class="py-2 pr-2">
-          <div class="input-group input-group-sm">
-            <div class="input-group-prepend">
-              <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
-            </div>
-      <?= tep_draw_pull_down_menu('configuration_group_selection', $groups_list, $gID)?>
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="d-flex justify-content-between">
+        <div class="mr-auto p-2 pageHeading">
+          <?php echo sprintf(TITLE_CONFIGURATION ,$cfg_group['configuration_group_title']); ?>
+        </div>
+        <div class="py-2 pr-2">
+              <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
+                </div>
+          <?= tep_draw_pull_down_menu('configuration_group_selection', $groups_list, $gID)?>
+          </div>
+        </div>
+        <div class="py-2">
+          <a class="btn btn-info btn-sm" href="javascript:DisplaySetup();"><i class="fas fa-cog"></i></a>
+        </div>
       </div>
     </div>
-    <div class="py-2">
-      <a class="btn btn-info btn-sm" href="javascript:DisplaySetup();"><i class="fas fa-cog"></i></a>
-    </div>
-  </div>
-  <table class="table table-sm table-striped table-hover">
-    <thead>
-    <tr class="table-info">
-      <th><?php echo TABLE_HEADING_CONFIGURATION_CONSTANT; ?></th>
-      <th><?php echo TABLE_HEADING_CONFIGURATION_TITLE; ?></th>
-      <th><?php echo TABLE_HEADING_CONFIGURATION_DESCRIPTION; ?></th>
-      <th class="text-center"><?php echo TABLE_HEADING_CONFIGURATION_VALUE; ?></th>
-      <th class="actions"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</th>
-    </tr>
-  </thead>
-  <tbody>
+
+    <div class="card-body" id="page-content">
+      <table class="table table-sm table-striped table-hover">
+        <thead>
+        <tr class="table-info">
+          <th><?php echo TABLE_HEADING_CONFIGURATION_CONSTANT; ?></th>
+          <th><?php echo TABLE_HEADING_CONFIGURATION_TITLE; ?></th>
+          <th><?php echo TABLE_HEADING_CONFIGURATION_DESCRIPTION; ?></th>
+          <th class="text-center"><?php echo TABLE_HEADING_CONFIGURATION_VALUE; ?></th>
+          <th class="actions"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
 <?php
   $configuration_query = tep_db_query("select configuration_id, configuration_key, configuration_title, configuration_description, configuration_value, use_function from " . TABLE_CONFIGURATION . " where configuration_group_id = '" . (int)$gID . "' order by sort_order");
   while ($configuration = tep_db_fetch_array($configuration_query)) {
@@ -78,18 +83,20 @@
       $cfgValue = '<i class="fas fa-times fa-lg text-danger"></i>';
     }
 ?>
-    <tr>
-      <td><?php echo $configuration['configuration_key']; ?></td>
-      <td><?php echo $configuration['configuration_title']; ?></td>
-      <td><?= $configuration['configuration_description'] ?></td>
-      <td class="text-center" id="val_<?= $configuration['configuration_id'] ?>"><?= $cfgValue ?></td>
-      <td class="actions"><a href="javascript:ModalEdit(<?= $configuration['configuration_id'] ?>);"><i class="fas fa-edit fa-lg text-primary"></i></a></td>
-    </tr>
+        <tr>
+          <td><?php echo $configuration['configuration_key']; ?></td>
+          <td><?php echo $configuration['configuration_title']; ?></td>
+          <td><?= $configuration['configuration_description'] ?></td>
+          <td class="text-center" id="val_<?= $configuration['configuration_id'] ?>"><?= $cfgValue ?></td>
+          <td class="actions"><a href="javascript:ModalEdit(<?= $configuration['configuration_id'] ?>);"><i class="fas fa-edit fa-lg text-primary"></i></a></td>
+        </tr>
 <?php
   }
 ?>
-    <tbody>
-  </table>
+        <tbody>
+      </table>
+    </div>
+  </div>
 <?php
 
   require ("includes/classes/modal.php");
