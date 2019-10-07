@@ -14,7 +14,6 @@
 <?php
   echo $OSCOM_Hooks->call('siteWide', 'injectBeforeFooter');
 ?>
-<hr>
 <?php
   require('includes/footer.php');
   
@@ -27,7 +26,6 @@
     <?php 
   echo $OSCOM_Hooks->call('siteWide', 'injectBodyWrapperEnd');
 ?>
-<br />
   </div> <!-- bodyWrapper //-->
 <?php 
   echo $OSCOM_Hooks->call('siteWide', 'injectAfterFooter');

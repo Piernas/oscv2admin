@@ -15,9 +15,8 @@ define('HEADING_TITLE', 'Action Recorder');
 define('TABLE_HEADING_MODULE', 'Module');
 define('TABLE_HEADING_CUSTOMER', 'Customer');
 define('TABLE_HEADING_DATE_ADDED', 'Date');
-
-
-define('TEXT_FILTER_SEARCH', 'Search:');
+define('TABLE_HEADING_IDENTIFIER', 'Identifier');
+define('HEADING_TITLE_SEARCH', 'Search:');
 define('TEXT_ALL_MODULES', '-- All Modules --');
 define('TEXT_GUEST', 'Guest');
 
