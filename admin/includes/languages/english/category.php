@@ -101,7 +101,7 @@ define('ERROR_CATALOG_IMAGE_DIRECTORY_DOES_NOT_EXIST', 'Error: Catalog images di
 define('ERROR_CANNOT_MOVE_CATEGORY_TO_PARENT', 'Error: Category cannot be moved into child category.');
 
 define('TEXT_CATEGORIES_DESCRIPTION', 'Category Description:<br><small>shows in category page</small>');
-define('TEXT_EDIT_CATEGORIES_DESCRIPTION', 'Edit the Category Description:');
+define('TEXT_EDIT_CATEGORIES_DESCRIPTION', 'Category Description:');
 
 define('TEXT_CATEGORIES_SEO_DESCRIPTION', 'Category Meta Description for SEO:<br><small>Add a &lt;description&gt; Meta Element.</small>');
 define('TEXT_EDIT_CATEGORIES_SEO_DESCRIPTION', 'Edit the Category Meta Description for SEO:<br><small>Changes the &lt;description&gt; Meta Element.</small>');
@@ -113,7 +113,7 @@ const TEXT_PRODUCTS_SEO_DESCRIPTION = 'Product Meta Description for SEO:<br><sma
 const TEXT_PRODUCTS_SEO_KEYWORDS = 'Product Meta Keywords for SEO:<br><small>Add a &lt;keyword&gt; Meta Element or Search Engine.<br>Must be comma separated. HTML is not allowed.</small>';
 const TEXT_PRODUCTS_SEO_TITLE = 'Products Title for SEO:<br><small>Replaces the product name in the &lt;title&gt; Meta Element<br>and optionally in the Breadcrumb Trail.<br>Leave blank to default to product name.</small>';
 const TEXT_CATEGORIES_SEO_TITLE = 'Category Title for SEO:<br><small>Replaces the category name in the &lt;title&gt; Meta Element.<br>Leave blank to default to category name.</small>';
-const TEXT_EDIT_CATEGORIES_SEO_TITLE = 'Edit the Category Title for SEO:<br><small>Replaces the category name in the &lt;title&gt; Meta Element<br>and optionally in the Breadcrumb Trail.<br>Leave blank to default to category name.</small>';
+const TEXT_EDIT_CATEGORIES_SEO_TITLE = 'Category Title for SEO';
 
 const TEXT_TOP_CATEGORY = 'Top category';
 const TABLE_HEADING_CATEGORIES_UNDER = 'Categories under: %s';
@@ -121,10 +121,6 @@ const TABLE_HEADING_DATE_ADDED = 'Date added';
 const TABLE_HEADING_LAST_MODIFIED = 'Last modified';
 const TABLE_HEADING_SORT_ORDER = 'Sort order';
 const TEXT_NO_CHILD_PRODUCTS = 'There are no products under this category.';
-define('HEADING_SEARCH_RESULTS', 'Search results');
-define('TABLE_HEADING_CATEGORIES_MATCHING','Categories ');
-define('TABLE_HEADING_PRODUCTS_MATCHING','Products');
-define('IMAGE_REMOVE_FILTER', 'Remove filter');
 define('TABLE_HEADING_PRODUCTS_ID', '#');
 define('TABLE_HEADING_PRODUCTS', 'Products');
 define('TABLE_HEADING_PRICE', 'Price');
@@ -134,7 +130,6 @@ define('TABLE_HEADING_AVERAGE_RATING', 'Rating');
 define('TEXT_DELETE_FROM_CATEGORIES', 'Delete also from the following categories:');
 define('TEXT_EMPTY_CATEGORY', 'Empty Category');
 define('SUCCESS_CATEGORY_DELETED', 'Category %s successfully deleted.');
-define('TEXT_EMPTY_SEARCH', 'Your search term did not produce any results.');
 
 
 define ('SUCCESS_CATEGORY_MOVED', 'Category has been moved successfully');

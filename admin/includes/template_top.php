@@ -41,7 +41,7 @@ echo $oscTemplate->getBlocks('admin_header_scripts');
 <?php
   echo $OSCOM_Hooks->call('siteWide', 'injectBodyContentStart');
 ?>
-  <div id="BodyContent" class="container-fluid bg-light">
+  <div id="BodyContent" class="container-fluid">
 <!-- alertes here -->
 <?php 
 

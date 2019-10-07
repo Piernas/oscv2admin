@@ -183,9 +183,14 @@ FORM { display: inline; }
   color: #007bff !important;
 */
   background-color:rgb(230, 240, 240); 
-
 }
 
+#BodyContent {
+  background-color:Gainsboro;
+}
+
+#page-heading {
+  /* background-color:Gainsboro; */
 }
 .preload {
     -webkit-transition: none !important;
