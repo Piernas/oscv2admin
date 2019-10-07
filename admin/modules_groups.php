@@ -13,41 +13,40 @@
   require('includes/application_top.php');
   require('includes/template_top.php');
 ?>
-  <div class="row">
-    <div class="col-sm-12"><h1 class="pageHeading"><i class="fa fa-cogs"></i> <?= HEADING_TITLE ?> </h1></div>
-  </div>
   
-  <style>
-.row.display-flex {
-  display: flex;
-  flex-wrap: wrap;
-}
-.row.display-flex > [class*='col-'] {
-  display: flex;
-  flex-direction: column;
-}
-</style>
-  <div class="row display-flex">
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="mr-auto pageHeading"><i class="fa fa-cogs"></i> <?= HEADING_TITLE ?> </div>
+    </div>
+    <div class="card-body" id="page-content">
+      <div class="row">
+
 <?php
   $modules_groups = $cfgModules->getAll();
-  $group_description =null;
-  $group_icon ="";
+
   foreach ($modules_groups as $modules_group) {
-  if (isset ($modules_groups['icon'])) {  
-    $group_icon ='<i class="fa fa-' . $modules_groups['icon'] . ' fa-lg"></i> ';
-  };
-//  if (!is_null ($group['description'])) $group_description = '<p>' . $group['description'] . '</p>';
 
 ?>
-  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-    <div class="alert alert-info text-center full-height">
-      <a href="<?= tep_href_link('modules.php', 'set=' .$modules_group['code']) ?>" class="alert-link"><?= $group_icon . $modules_group['title'] ?></a><?= $group_description ?>
-    </div>
-  </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 pb-3">
+            <div class="card card-modules">
+              <a href="<?= tep_href_link('modules.php', 'set=' .$modules_group['code']) ?>" class="alert-link">
+                <div class="card-body text-center"><?= $modules_group['title'] ?></a>
+              </a>
+            </div>
+          </div>    
+        </div>
 <?php
 }
 ?>
-</div>
+      </div>
+
+    </div>
+  </div>
+<style>
+.card-modules{
+  background-color: lightblue;
+}
+</style>
 <?php
   require('includes/template_bottom.php');
   require('includes/application_bottom.php');
