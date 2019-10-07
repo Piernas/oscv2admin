@@ -19,7 +19,6 @@
 
       if ( defined($this->cfg_key . 'STATUS')) {
         $this->enabled = (constant($this->cfg_key . 'STATUS') == 'True');
-        $this->align = constant($this->cfg_key . 'ALIGN');
         $this->sort_order = constant($this->cfg_key . 'SORT_ORDER');
         $this->value = $this->get_value($id);
       }
@@ -27,7 +26,6 @@
   
     function get_value ($id) {
       global $languages;
-      $button ="assss";
       if (DEFAULT_LANGUAGE == $id) {
         $button = '                  <i class="fas fa-star fa-lg text-success"></i>' . PHP_EOL;
       } else {

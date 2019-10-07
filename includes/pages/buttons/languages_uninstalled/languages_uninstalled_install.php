@@ -23,7 +23,7 @@
     }
   
     function get_value ($code) {
-      $button = '                  <a id="languages-install-' . $code . '" href="' . tep_href_link('languages.php',  tep_get_all_get_params(array('ID')) . 'code=' . $code . '&action=modules_pages_install') . '"><i class="fas fa-plus-circle fa-lg text-info"></i></a>' . PHP_EOL;
+      $button = '                  <a id="languages-install-' . $code . '" href="' . tep_href_link('languages.php',  tep_get_all_get_params(array('code', 'action')) . 'code=' . $code . '&action=languages_install') . '"><i class="fas fa-plus-circle fa-lg text-info"></i></a>' . PHP_EOL;
       return $button;
     }
     
