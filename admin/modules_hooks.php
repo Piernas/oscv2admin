@@ -16,25 +16,26 @@
 
   require('includes/template_top.php');
 ?>
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="mr-auto p-2 pageHeading"><i class="fas fa-folder fa-lg"></i> <?= HEADING_TITLE  ?></div>
 
-<table border="0" width="100%" cellspacing="0" cellpadding="2">
-  <tr>
-    <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
-    <td class="pageHeading" align="right"><?php echo tep_draw_separator('pixel_trans.gif', HEADING_IMAGE_WIDTH, HEADING_IMAGE_HEIGHT); ?></td>
-  </tr>
-</table>
 
-<table border="0" width="100%" cellspacing="0" cellpadding="2">
 
+    </div>
+    <div class="card-body" id="page-content">
 <?php
   if ( $dir = @dir($directory) ) {
     while ( $file = $dir->read() ) {
       if ( is_dir($directory . '/' . $file) && !in_array($file, array('.', '..')) ) {
 ?>
+      <table class="table table-sm table-striped">
+        <thead>
+        <tr class="table-info">
+          <th colspan="2"><?php echo $file; ?></th>
+        </tr>
+        </thead>
 
-  <tr class="dataTableHeadingRow">
-    <td class="dataTableHeadingContent" colspan="2"><?php echo $file; ?></td>
-  </tr>
 
 <?php
         if ( $dir2 = @dir($directory . '/' . $file) ) {
@@ -56,12 +57,10 @@
                       foreach ( get_class_methods($obj) as $method ) {
                         if ( substr($method, 0, 7) == 'listen_' ) {
 ?>
-
-  <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)">
-    <td class="dataTableContent"><?php echo $file2 . '/' . $file3; ?></td>
-    <td class="dataTableContent"><?php echo substr($method, 7); ?></td>
-  </tr>
-
+        <tr>
+          <td class="dataTableContent"><?php echo $file2 . '/' . $file3; ?></td>
+          <td class="dataTableContent"><?php echo substr($method, 7); ?></td>
+        </tr>
 <?php
                         }
                       }
@@ -72,14 +71,20 @@
             }
           }
         }
+?>
+        </tbody>
+      </table>
+<?php
       }
     }
   }
 ?>
 
-</table>
+      <div class="alert alert-info my-2"><?= TEXT_HOOKS_DIRECTORY . ' ' . DIR_FS_CATALOG . 'includes/hooks/'; ?></div>
+    </div>
+  </div>
 
-<p class="smallText"><?php echo TEXT_HOOKS_DIRECTORY . ' ' . DIR_FS_CATALOG . 'includes/hooks/'; ?></p>
+<hr>
 
 <?php
   require('includes/template_bottom.php');
