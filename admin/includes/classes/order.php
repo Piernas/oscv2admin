@@ -36,7 +36,8 @@
                                 'class' => $totals['class']);
       }
 
-      $this->info = array('total' => null,
+      $this->info = array('orders_id' => $order_id,
+                          'total' => null,
                           'currency' => $order['currency'],
                           'currency_value' => $order['currency_value'],
                           'payment_method' => $order['payment_method'],
