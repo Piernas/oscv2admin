@@ -883,7 +883,6 @@
           $category = tep_db_fetch_array($category_query);
           $categories_array[$index][] = array('id' => $categories['categories_id'], 'text' => $category['categories_name']);
           if ( (tep_not_null($category['parent_id'])) && ($category['parent_id'] != '0') ) $categories_array = tep_generate_category_path($category['parent_id'], 'category', $categories_array, $index);
-          $categories_array[$index] = array_reverse($categories_array[$index]);
         }
         $index++;
       }
@@ -891,12 +890,55 @@
       $category_query = tep_db_query("select cd.categories_name, c.parent_id from " . TABLE_CATEGORIES . " c, " . TABLE_CATEGORIES_DESCRIPTION . " cd where c.categories_id = '" . (int)$id . "' and c.categories_id = cd.categories_id and cd.language_id = '" . (int)$languages_id . "'");
       $category = tep_db_fetch_array($category_query);
       $categories_array[$index][] = array('id' => $id, 'text' => $category['categories_name']);
-      if ( (tep_not_null($category['parent_id'])) && ($category['parent_id'] != '0') ) $categories_array = tep_generate_category_path($category['parent_id'], 'category', $categories_array, $index);
+      if ( (tep_not_null($category['parent_id'])) && ($category['parent_id'] != '0') ) {
+        $categories_array = tep_generate_category_path($category['parent_id'], 'category', $categories_array, $index);
+      } else {
+          $categories_array[$index] = array_reverse($categories_array[$index]);
+      }
     }
 
     return $categories_array;
   }
 
+   function tep_output_generated_category_breadcrumb ($id, $from = 'category') {
+     global $PHP_SELF;
+    $calculated_category_path_string = '';
+    $calculated_category_path__id ="0";
+    $calculated_category_path = tep_generate_category_path($id, $from);
+    for ($i=0, $n=sizeof($calculated_category_path); $i<$n; $i++) {
+      for ($j=0, $k=sizeof($calculated_category_path[$i]); $j<$k; $j++) {
+        $calculated_category_path__id = $calculated_category_path__id ."_" . $calculated_category_path[$i][$j]['id'];
+        $calculated_category_path_string .= '<a href="';
+        $calculated_category_path_string .= tep_href_link (basename($PHP_SELF) . '?cPath=' . $calculated_category_path__id);
+        
+        $calculated_category_path_string .= '">' . $calculated_category_path[$i][$j]['text'] . '</a>&nbsp;&gt;&nbsp;';
+      }
+      $calculated_category_path_string = substr($calculated_category_path_string, 0, -16) . '<br />';
+    }
+    $calculated_category_path_string = substr($calculated_category_path_string, 0, -6);
+
+    if (strlen($calculated_category_path_string) < 1) $calculated_category_path_string = TEXT_TOP;
+
+    return $calculated_category_path_string;
+  }
+  
+  function tep_output_generated_ul_category_path($id, $from = 'category') {
+    $calculated_category_path_string = '';
+    $calculated_category_path = tep_generate_category_path($id, $from);
+    for ($i=0, $n=sizeof($calculated_category_path); $i<$n; $i++) {
+      $calculated_category_path_string .= '  <li>';
+      for ($j=0, $k=sizeof($calculated_category_path[$i]); $j<$k; $j++) {
+        $calculated_category_path_string .= $calculated_category_path[$i][$j]['text'] . '&nbsp;&gt;&nbsp;';
+      }
+      $calculated_category_path_string = substr($calculated_category_path_string, 0, -16);
+    }
+      $calculated_category_path_string .= '  </li>' . PHP_EOL;
+
+    if (strlen($calculated_category_path_string) < 1) $calculated_category_path_string = TEXT_TOP;
+    
+    return '<ul>' . PHP_EOL . $calculated_category_path_string . '</ul>' . PHP_EOL;
+  }
+  
   function tep_output_generated_category_path($id, $from = 'category') {
     $calculated_category_path_string = '';
     $calculated_category_path = tep_generate_category_path($id, $from);
