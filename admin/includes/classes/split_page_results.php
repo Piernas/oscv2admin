@@ -50,20 +50,25 @@
       for ($i=1; $i<=$num_pages; $i++) {
         $pages_array[] = array('id' => $i, 'text' => $i);
       }
-
+print_r ($pages_array);
       if ($num_pages > 1) {
-        $display_links = tep_draw_form('pages', $PHP_SELF, '', 'get');
+        $display_links = tep_draw_form('pages', $PHP_SELF, '', 'get', 'class="form-inline" style="float:right"'). '<div class="form-group">';
 
         if ($current_page_number > 1) {
-          $display_links .= '<a href="' . tep_href_link($PHP_SELF, $parameters . $page_name . '=' . ($current_page_number - 1)) . '" class="splitPageLink">' . PREVNEXT_BUTTON_PREV . '</a>&nbsp;&nbsp;';
+          $display_links .= '&nbsp;&nbsp;<a href="' . tep_href_link($PHP_SELF, $parameters . $page_name . '=' . ($current_page_number - 1)) . '" class="btn btn-primary mr-2">' . PREVNEXT_BUTTON_PREV . '</a>&nbsp;&nbsp;';
         } else {
           $display_links .= PREVNEXT_BUTTON_PREV . '&nbsp;&nbsp;';
         }
+        $display_links .= '</div><div class="form-group">';
+        $display_links .= sprintf('<label>'.TEXT_RESULT_PAGE.'</label>', tep_draw_pull_down_menu($page_name, $pages_array, $current_page_number, ' class="form-control form-control-sm mx-2" onchange="this.form.submit();"'), $num_pages);
 
-        $display_links .= sprintf(TEXT_RESULT_PAGE, tep_draw_pull_down_menu($page_name, $pages_array, $current_page_number, 'onchange="this.form.submit();"'), $num_pages);
+
+        $display_links .= '</div><div class="form-group ml-2">';
+
+//        $display_links .= sprintf(TEXT_RESULT_PAGE, tep_draw_pull_down_menu($page_name, $pages_array, $current_page_number, 'onchange="this.form.submit();"'), $num_pages);
 
         if (($current_page_number < $num_pages) && ($num_pages != 1)) {
-          $display_links .= '&nbsp;&nbsp;<a href="' . tep_href_link($PHP_SELF, $parameters . $page_name . '=' . ($current_page_number + 1)) . '" class="splitPageLink">' . PREVNEXT_BUTTON_NEXT . '</a>';
+          $display_links .= '&nbsp;&nbsp;<a href="' . tep_href_link($PHP_SELF, $parameters . $page_name . '=' . ($current_page_number + 1)) . '" class="btn btn-primary splitPageLink">' . PREVNEXT_BUTTON_NEXT . '</a>&nbsp;&nbsp;';
         } else {
           $display_links .= '&nbsp;&nbsp;' . PREVNEXT_BUTTON_NEXT;
         }
@@ -77,7 +82,7 @@
           }
         }
 
-        $display_links .= tep_hide_session_id() . '</form>';
+        $display_links .= tep_hide_session_id() . '</div></form>';
       } else {
         $display_links = sprintf(TEXT_RESULT_PAGE, $num_pages, $num_pages);
       }
