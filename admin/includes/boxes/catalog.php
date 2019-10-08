@@ -19,11 +19,6 @@
         'link' => tep_href_link('categories.php')
       ),
       array(
-        'code' => 'products_attributes.php',
-        'title' => BOX_CATALOG_CATEGORIES_PRODUCTS_ATTRIBUTES,
-        'link' => tep_href_link('products_attributes.php')
-      ),
-      array(
         'code' => 'manufacturers.php',
         'title' => BOX_CATALOG_MANUFACTURERS,
         'link' => tep_href_link('manufacturers.php')
