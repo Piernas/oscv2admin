@@ -190,7 +190,7 @@ FORM { display: inline; }
 }
 
 #page-heading {
-  /* background-color:Gainsboro; */
+  background-color: LightBlue;
 }
 .preload {
     -webkit-transition: none !important;
