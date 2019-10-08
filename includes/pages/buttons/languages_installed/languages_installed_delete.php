@@ -69,7 +69,6 @@ function ModalDeleteLanguage(languageID){
 EOD;
 
       return $jScript;
-
     }
 
     function check() {

@@ -92,7 +92,7 @@ define('BOX_ORDERS_ORDERS', 'Orders');
 // taxes box text in includes/boxes/taxes.php
 define('BOX_HEADING_LOCATION_AND_TAXES', 'Locations / Taxes');
 define('BOX_TAXES_COUNTRIES', 'Countries');
-define('BOX_TAXES_ZONES', 'Zones');
+define('BOX_TAXES_ZONES', 'Country Zones');
 define('BOX_TAXES_GEO_ZONES', 'Tax Zones');
 define('BOX_TAXES_TAX_CLASSES', 'Tax Classes');
 define('BOX_TAXES_TAX_RATES', 'Tax Rates');
