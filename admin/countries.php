@@ -11,9 +11,10 @@
 */
 
   require('includes/application_top.php');
-
+  require('includes/classes/countries.php');
+  $clsCountries = new countries();
   $action = (isset($_GET['action']) ? $_GET['action'] : '');
-
+  $page = (isset($_GET['page']) ? $_GET['page'] : '');
   if (tep_not_null($action)) {
     switch ($action) {
       case 'insert':
@@ -50,31 +51,43 @@
   require('includes/template_top.php');
 ?>
 
-    <table border="0" width="100%" cellspacing="0" cellpadding="2">
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
-            <td class="pageHeading" align="right"><?php echo tep_draw_separator('pixel_trans.gif', HEADING_IMAGE_WIDTH, HEADING_IMAGE_HEIGHT); ?></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td valign="top"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-              <tr class="dataTableHeadingRow">
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_COUNTRY_NAME; ?></td>
-                <td class="dataTableHeadingContent" align="center" colspan="2"><?php echo TABLE_HEADING_COUNTRY_CODES; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</td>
-              </tr>
+   <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="d-flex justify-content-between">
+        <div class="mr-auto pageHeading"><i class="fas fa-users fa-lg"></i> <?= HEADING_TITLE ?></div>
+          <div class="pr-2"><?php if (empty($action)) echo tep_draw_button(IMAGE_NEW_COUNTRY, 'fas fa-plus-circle', tep_href_link('countries.php', tep_get_all_get_params(array( 'action')) . 'action=new')); ?></div>
+        <div>
+          <?= tep_draw_form('search', basename($PHP_SELF),"" ,"get" ,'class="form-inline"') ?>
+            <div class="form-group form-group-sm">
+              <?= tep_draw_input_field('search', null, ' size="20" placeholder="' . HEADING_TITLE_SEARCH . '"') ?>
+              <?= tep_draw_hidden_field ('cPath', $cPath); ?>
+              <div class="input-group-append"><button class="btn btn-sm btn-info" disabled type="submit"><i class="fas fa-search"></i></button></div>
+            </div>
+            <?= tep_hide_session_id() ?>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" id="page-content">
+      <table class="table table-sm table-striped table-hover">
+        <thead>
+        <tr class="table-info">
+          <th><?php echo TABLE_HEADING_COUNTRY_NAME; ?></th>
+          <th class="text-center">ISO CODE 2</th>
+          <th class="text-center">ISO CODE 3</th>
+          <th class="actions"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
 <?php
-  $countries_query_raw = "select countries_id, countries_name, countries_iso_code_2, countries_iso_code_3, address_format_id from " . TABLE_COUNTRIES . " order by countries_name";
-  $countries_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $countries_query_raw, $countries_query_numrows);
+   $countries_query_raw = "select countries_id from " . TABLE_COUNTRIES . " order by countries_name";  $countries_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $countries_query_raw, $countries_query_numrows);
   $countries_query = tep_db_query($countries_query_raw);
-  while ($countries = tep_db_fetch_array($countries_query)) {
-    if ((!isset($_GET['cID']) || (isset($_GET['cID']) && ($_GET['cID'] == $countries['countries_id']))) && !isset($cInfo) && (substr($action, 0, 3) != 'new')) {
-      $cInfo = new objectInfo($countries);
+  $country_data_array = $clsCountries->get_countries_details ();
+  while ($countries_list = tep_db_fetch_array($countries_query)) {    
+/*  
+  if ((!isset($_GET['cID']) || (isset($_GET['cID']) && ($_GET['cID'] == $countries['countries_id']))) && !isset($cInfo) && (substr($action, 0, 3) != 'new')) {
+  
+  $cInfo = new objectInfo($countries);
     }
 
     if (isset($cInfo) && is_object($cInfo) && ($countries['countries_id'] == $cInfo->countries_id)) {
@@ -82,33 +95,34 @@
     } else {
       echo '                  <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('countries.php', 'page=' . $_GET['page'] . '&cID=' . $countries['countries_id']) . '\'">' . "\n";
     }
+*/    
+       $country = $country_data_array[$countries_list['countries_id']];
+
+
 ?>
-                <td class="dataTableContent"><?php echo $countries['countries_name']; ?></td>
-                <td class="dataTableContent" align="center" width="40"><?php echo $countries['countries_iso_code_2']; ?></td>
-                <td class="dataTableContent" align="center" width="40"><?php echo $countries['countries_iso_code_3']; ?></td>
-                <td class="dataTableContent" align="right"><?php if (isset($cInfo) && is_object($cInfo) && ($countries['countries_id'] == $cInfo->countries_id) ) { echo tep_image('images/icon_arrow_right.gif', ''); } else { echo '<a href="' . tep_href_link('countries.php', 'page=' . $_GET['page'] . '&cID=' . $countries['countries_id']) . '">' . tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '</a>'; } ?>&nbsp;</td>
+              <tr class="clickable">
+                <td><?php echo $country['countries_name']; ?></td>
+                <td align="center"><?php echo $country['countries_iso_code_2']; ?></td>
+                <td align="center"><?php echo $country['countries_iso_code_3']; ?></td>
+                  <td class="actions">
+                  <a href="javascript:ModalCountryEdit(<?= $country['countries_id'] ?>);"><i class="fas fa-edit fa-lg text-primary"></i></a>
+                  <a href="javascript:ModalCountryDelete(<?= $country['countries_id'] ?>);"><i class="fas fa-trash fa-lg text-danger"></i></a>
+                  </td>
               </tr>
 <?php
   }
+  
+  
+  
 ?>
-              <tr>
-                <td colspan="4"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-                  <tr>
-                    <td class="smallText" valign="top"><?php echo $countries_split->display_count($countries_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_COUNTRIES); ?></td>
-                    <td class="smallText" align="right"><?php echo $countries_split->display_links($countries_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page']); ?></td>
-                  </tr>
-<?php
-  if (empty($action)) {
-?>
-                  <tr>
-                    <td class="smallText" colspan="2" align="right"><?php echo tep_draw_button(IMAGE_NEW_COUNTRY, 'plus', tep_href_link('countries.php', 'page=' . $_GET['page'] . '&action=new')); ?></td>
-                  </tr>
-<?php
-  }
-?>
-                </table></td>
-              </tr>
-            </table></td>
+               </tbody>
+            </table>
+    </div>
+    <div class="card-footer">
+      <?php echo $countries_split->display_count($countries_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_COUNTRIES); ?>
+      <?php echo $countries_split->display_links($countries_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page']); ?>
+    </div>
+  </div>
 <?php
   $heading = array();
   $contents = array();

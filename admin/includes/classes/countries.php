@@ -21,6 +21,20 @@
       return $countries_list;
     }
 
+    function get_countries_details () {
+      $countries_query = tep_db_query("select * from " . TABLE_COUNTRIES . " order by countries_name");
+      while ($countries = tep_db_fetch_array($countries_query)) {
+       $countries_list[$countries['countries_id']] = array('countries_id' =>$countries['countries_id'],
+                                                           'countries_name' =>$countries['countries_name'],
+                                                           'countries_iso_code_2' =>$countries['countries_iso_code_2'],
+                                                           'countries_iso_code_3' =>$countries['countries_iso_code_3'],
+                                                           'address_format_id' =>$countries['address_format_id']
+                                                          );
+      }
+      return $countries_list;
+    }
+
+
 /*
  * ZONE METHODS
 */
