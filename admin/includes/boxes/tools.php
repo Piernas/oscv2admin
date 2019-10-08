@@ -39,11 +39,6 @@
         'link' => tep_href_link('mail.php')
       ),
       array(
-        'code' => 'newsletters.php',
-        'title' => BOX_TOOLS_NEWSLETTER_MANAGER,
-        'link' => tep_href_link('newsletters.php')
-      ),
-      array(
         'code' => 'sec_dir_permissions.php',
         'title' => BOX_TOOLS_SEC_DIR_PERMISSIONS,
         'link' => tep_href_link('sec_dir_permissions.php')
