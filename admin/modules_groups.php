@@ -28,25 +28,17 @@
 
 ?>
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 pb-3">
-            <div class="card card-modules">
-              <a href="<?= tep_href_link('modules.php', 'set=' .$modules_group['code']) ?>" class="alert-link">
-                <div class="card-body text-center"><?= $modules_group['title'] ?></a>
-              </a>
-            </div>
+          <div class="card card-modules">
+            <a href="<?= tep_href_link('modules.php', 'set=' .$modules_group['code']) ?>" class="alert-link">
+            <div class="card-body text-center"><?= $modules_group['title'] ?></a></div>
           </div>    
         </div>
 <?php
 }
 ?>
       </div>
-
     </div>
   </div>
-<style>
-.card-modules{
-  background-color: lightblue;
-}
-</style>
 <?php
   require('includes/template_bottom.php');
   require('includes/application_bottom.php');
