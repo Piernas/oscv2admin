@@ -1,170 +1,393 @@
 <?php
-/*
-  $Id$
-
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
-
-  Copyright (c) 2010 osCommerce
-
-  Released under the GNU General Public License
-*/
+/* 
+ * 
+ * Copyright 2019 Juan Manuel de Castro
+ * Released under the GPL v3.0 License
+ * 
+ */
 
   require('includes/application_top.php');
+  require('includes/classes/countries.php');
+  
+  $zones = new countries ();
+  $countries_with_zones = $zones->get_countries_with_zones();
+
+  if (isset($_GET['country_id'])) echo "<script>window.onload = function() {localStorage.removeItem('lastTab')};;</script>";
 
   $action = (isset($_GET['action']) ? $_GET['action'] : '');
-
   if (tep_not_null($action)) {
     switch ($action) {
-      case 'insert':
-        $zone_country_id = tep_db_prepare_input($_POST['zone_country_id']);
-        $zone_code = tep_db_prepare_input($_POST['zone_code']);
-        $zone_name = tep_db_prepare_input($_POST['zone_name']);
+      
+      case 'zone_add_get_form':
+      
+        $zones_countries = $zones->get_no_zone_countries();
+        
+        foreach ($zones_countries as $id => $text) {
+          $countries_array [] = array ('id' => $id, 'text' => $text);
+        }
+        
+        $zones_controls = '<div class="form-group"><label>' . TEXT_INFO_ZONES_NAME . '</label>' . tep_draw_input_field('zone_name', '','required="true"') . '</div>';
+        $zones_controls .= '<div class="form-group"><label>' . TEXT_INFO_ZONES_CODE . '</label>' . tep_draw_input_field('zone_code', '') . '</div>';
+        $zones_controls .= '<div class="form-group"><label>' . TEXT_INFO_COUNTRY_NAME . '</label>' . tep_draw_pull_down_menu('zone_country_id', $countries_array) . '</div>';;
+        echo '<div id="title">' . TEXT_INFO_HEADING_NEW_ZONE . '</div>' . PHP_EOL;
+        echo '<div id="content">' . $zones_controls . '</div>';
 
-        tep_db_query("insert into " . TABLE_ZONES . " (zone_country_id, zone_code, zone_name) values ('" . (int)$zone_country_id . "', '" . tep_db_input($zone_code) . "', '" . tep_db_input($zone_name) . "')");
+        exit();
+        break;
+      
+      case 'zone_add':
+        $zone_name = tep_db_prepare_input($_POST['zone_name']);
+        $zone_code = tep_db_prepare_input($_POST['zone_code']);
+        $zone_country_id = (int)$_POST['zone_country_id'];
+        $zones->add_zone($zone_name, $zone_code, $zone_country_id);
+        $messageStack->add_session(sprintf (MESSAGE_ZONE_ADDED, $zone_name),'success');
+
+        tep_redirect(tep_href_link('zones.php?country_id=' . $zone_country_id));
+        break;
+      
+      case 'zone_add_to_country_get_form':
+        $country_id = (int)$_GET['country_id'];
+        $zones_controls = '<div class="form-group"><label>' . TEXT_INFO_ZONES_NAME . '</label>' . tep_draw_input_field('zone_name', '','required="true"') . '</div>';
+        $zones_controls .= '<div class="form-group"><label>' . TEXT_INFO_ZONES_CODE . '</label>' . tep_draw_input_field('zone_code', '') . '</div>';
+        $zones_controls .= tep_draw_hidden_field('zone_country_id', $country_id);
+
+        echo '<div id="title">' . TEXT_INFO_HEADING_NEW_ZONE . '</div>' . PHP_EOL;
+        echo '<div id="content">' . $zones_controls . '</div>';
+
+        exit();
+        break;
+
+
+      case 'zone_edit_get_form':
+        $zone_id = tep_db_prepare_input($_GET['zone_id']);
+        $zone_data = $zones->get_zone_data($zone_id);
+        $zones_controls = "";
+        
+        $zones_controls .= '<div class="form-group"><label>' . TEXT_INFO_ZONES_NAME . '</label>' . tep_draw_input_field('zone_name', $zone_data['zone_name'],'required="true"') . '</div>';
+        $zones_controls .= '<div class="form-group"><label>' . TEXT_INFO_ZONES_CODE . '</label>' . tep_draw_input_field('zone_code', $zone_data['zone_code']) . '</div>';
+        $zones_controls .= tep_draw_hidden_field('zone_country_id', $zone_data['zone_country_id']);
+        $zones_controls .= tep_draw_hidden_field('zone_id', $zone_data['zone_id']);
+        echo '<div id="title">' . TEXT_INFO_HEADING_EDIT_ZONE . '</div>' . PHP_EOL;
+        echo '<div id="content">' . $zones_controls . '</div>';
+
+        exit();
+        
+        break;
+
+      case 'zone_edit':
+        $zone_id = (int)$_POST['zone_id'];
+        $zone_country_id = (int)$_POST['zone_country_id'];
+        $zone_name = tep_db_prepare_input($_POST['zone_name']);
+        $zone_code = tep_db_prepare_input($_POST['zone_code']);
+        $zones->edit_zone($zone_id, $zone_name, $zone_code, $zone_country_id);
+        tep_redirect(tep_href_link('zones.php'));
+        break;
+
+      case 'zone_delete':
+        $zone_id = (int)$_GET['zone_id'];
+        echo '<span id="title"><strong><i class="fas fa-trash fa-lg"></i> ' . TEXT_INFO_HEADING_DELETE_ZONE . '</strong></span>';
+        echo '<span id="content">' . PHP_EOL;
+        echo '<p>' . TEXT_INFO_DELETE_INTRO . '</p>' . PHP_EOL;
+        echo '</span>';
+        exit();
+        break;
+
+      case 'zone_delete_all':
+        $country_id = (int)$_GET['country_id'];
+        $countries_array = $zones->get_countries_list();
+        $country_name = $countries_array [$country_id];
+        echo '<span id="title"><strong><i class="fas fa-trash fa-lg"></i> ' . sprintf(TEXT_INFO_HEADING_REMOVE_ALL_ZONES, $country_name) . '</strong></span>';
+        echo '<span id="content">' . PHP_EOL;
+        echo '<p>' . sprintf(TEXT_INFO_DELETE_ALL_INTRO, $country_name) . '</p>' . PHP_EOL;
+        echo '</span>';
+        exit();
+        break;
+
+
+      case 'zone_delete_confirm':
+        $zone_id = tep_db_prepare_input($_GET['zone_id']);
+        $country_id = (int)$_GET['country_id'];
+        $zones->remove_zone ($zone_id);
+        $messageStack->add_session(sprintf (MESSAGE_ZONE_DELETED),'success');
+
+        if(in_array ($country_id,$zones->countries_with_zones)){
+          tep_redirect(tep_href_link('zones.php?country_id=' . $country_id));
+        } else {
+          tep_redirect(tep_href_link('zones.php'));
+        }
+        break;
+
+      case 'zone_delete_all_confirm':
+      
+        $country_id = (int)$_GET['country_id'];
+        $countries_array = $zones->get_countries_list();
+        $country_name = $countries_array [$country_id];
+        $zones->remove_all_country_zones ($country_id);
+        $messageStack->add_session(sprintf (MESSAGE_ZONES_DELETED, $country_name),'success');
 
         tep_redirect(tep_href_link('zones.php'));
         break;
-      case 'save':
-        $zone_id = tep_db_prepare_input($_GET['cID']);
-        $zone_country_id = tep_db_prepare_input($_POST['zone_country_id']);
-        $zone_code = tep_db_prepare_input($_POST['zone_code']);
-        $zone_name = tep_db_prepare_input($_POST['zone_name']);
 
-        tep_db_query("update " . TABLE_ZONES . " set zone_country_id = '" . (int)$zone_country_id . "', zone_code = '" . tep_db_input($zone_code) . "', zone_name = '" . tep_db_input($zone_name) . "' where zone_id = '" . (int)$zone_id . "'");
-
-        tep_redirect(tep_href_link('zones.php', 'page=' . $_GET['page'] . '&cID=' . $zone_id));
-        break;
-      case 'deleteconfirm':
-        $zone_id = tep_db_prepare_input($_GET['cID']);
-
-        tep_db_query("delete from " . TABLE_ZONES . " where zone_id = '" . (int)$zone_id . "'");
-
-        tep_redirect(tep_href_link('zones.php', 'page=' . $_GET['page']));
-        break;
     }
   }
+
 
   require('includes/template_top.php');
 ?>
 
-    <table border="0" width="100%" cellspacing="0" cellpadding="2">
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
-            <td class="pageHeading" align="right"><?php echo tep_draw_separator('pixel_trans.gif', HEADING_IMAGE_WIDTH, HEADING_IMAGE_HEIGHT); ?></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td valign="top"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-              <tr class="dataTableHeadingRow">
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_COUNTRY_NAME; ?></td>
-                <td class="dataTableHeadingContent"><?php echo TABLE_HEADING_ZONE_NAME; ?></td>
-                <td class="dataTableHeadingContent" align="center"><?php echo TABLE_HEADING_ZONE_CODE; ?></td>
-                <td class="dataTableHeadingContent" align="right"><?php echo TABLE_HEADING_ACTION; ?>&nbsp;</td>
-              </tr>
-<?php
-  $zones_query_raw = "select z.zone_id, c.countries_id, c.countries_name, z.zone_name, z.zone_code, z.zone_country_id from " . TABLE_ZONES . " z, " . TABLE_COUNTRIES . " c where z.zone_country_id = c.countries_id order by c.countries_name, z.zone_name";
-  $zones_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $zones_query_raw, $zones_query_numrows);
-  $zones_query = tep_db_query($zones_query_raw);
-  while ($zones = tep_db_fetch_array($zones_query)) {
-    if ((!isset($_GET['cID']) || (isset($_GET['cID']) && ($_GET['cID'] == $zones['zone_id']))) && !isset($cInfo) && (substr($action, 0, 3) != 'new')) {
-      $cInfo = new objectInfo($zones);
-    }
+  <div class="card my-3">
+    <div class="card-header" id="page-heading">
+      <div class="d-flex justify-content-between">
+        <div class="mr-auto pageHeading"><i class="fas fa-cogs"></i>&nbsp;<?= HEADING_TITLE ?></div>
+        <div><?= tep_draw_button(TEXT_INFO_HEADING_NEW_ZONE_COUNTRY, 'fas fa-plus-circle', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalAddZone();"'), 'btn-info brn-sm') ?></div>
+      </div>
+    </div>
 
-    if (isset($cInfo) && is_object($cInfo) && ($zones['zone_id'] == $cInfo->zone_id)) {
-      echo '              <tr id="defaultSelected" class="dataTableRowSelected" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('zones.php', 'page=' . $_GET['page'] . '&cID=' . $cInfo->zone_id . '&action=edit') . '\'">' . "\n";
+    <div class="card-header" id="page-heading">
+      <ul id="ColumnsTabsMain" class="nav nav-tabs card-header-tabs">
+<?php
+
+  if (!isset($_GET['country_id'])) {
+      $active = ' active';
+      
+  } else {
+    $active = '';    
+  }
+  
+  foreach ($countries_with_zones as $country_id => $country_name) {
+
+    if (isset($_GET['country_id']) && $country_id == $_GET['country_id']) $active = ' active';
+
+?>
+        <li class="nav-item"><a class="nav-link<?= $active ?>" data-target ="#section_<?= $country_id ?>" data-toggle="tab"><?= $country_name ?></a></li>
+<?php
+    $active = "";
+  }
+?>
+      </ul>
+    </div>
+    <div class="card-body" id="page-content">
+      <div class="tab-content">
+<?php
+
+    if (!isset($_GET['country_id'])) {
+      $active = ' active';
     } else {
-      echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . tep_href_link('zones.php', 'page=' . $_GET['page'] . '&cID=' . $zones['zone_id']) . '\'">' . "\n";
+      $active = '';    
+    }
+  
+    foreach ($countries_with_zones as $country_id => $country_name) {
+      $zones_array = $zones->get_country_zones($country_id);
+
+
+      if (isset($_GET['country_id']) && $country_id == $_GET['country_id']) $active = ' active';
+
+?>
+        <div id="section_<?= $country_id ?>" class="tab-pane<?= $active ?>">
+          <table class="table table-sm table-striped table-hover" id="table-$country_id">
+            <thead>
+            <tr class="table-info">
+              <th><?= TABLE_HEADING_ZONE_NAME ?></th>
+              <th><?= TABLE_HEADING_ZONE_CODE ?></th>
+              <th class="actions"><?= TABLE_HEADING_ACTION; ?></th>
+            </tr>
+            </thead>
+            <tbody>
+<?php
+    foreach ($zones_array as $zone_id => $zone_properties) {
+?>
+            <tr class="clickable">
+                <td><?= $zone_properties['name'] ?></td>
+                <td><?= $zone_properties['code'] ?></td>
+                <td class="actions">
+                  <a href="javascript:ModalEditZone('<?= $zone_id ?>');" title="<?= TEXT_INFO_HEADING_EDIT_ZONE ?>" data-toggle="tooltip"><i class="fas fa-edit text-info fa-lg"></i></a>
+                  <a href="javascript:ModalDeleteZone('<?= $zone_id ?>', '<?= $country_id ?>');" title="<?= TEXT_INFO_HEADING_DELETE_ZONE ?>" data-toggle="tooltip"><i class="fas fa-trash text-danger fa-lg"></i></a>
+                </td>
+            </tr>
+<?php
     }
 ?>
-                <td class="dataTableContent"><?php echo $zones['countries_name']; ?></td>
-                <td class="dataTableContent"><?php echo $zones['zone_name']; ?></td>
-                <td class="dataTableContent" align="center"><?php echo $zones['zone_code']; ?></td>
-                <td class="dataTableContent" align="right"><?php if (isset($cInfo) && is_object($cInfo) && ($zones['zone_id'] == $cInfo->zone_id) ) { echo tep_image('images/icon_arrow_right.gif', ''); } else { echo '<a href="' . tep_href_link('zones.php', 'page=' . $_GET['page'] . '&cID=' . $zones['zone_id']) . '">' . tep_image('images/icon_info.gif', IMAGE_ICON_INFO) . '</a>'; } ?>&nbsp;</td>
-              </tr>
+            </tbody>
+          </table>
+          <div>
+            <div class=" float-right">
+            <?= tep_draw_button(sprintf(TEXT_INFO_HEADING_NEW_ZONE_IN_COUNTRY, $country_name), 'fas fa-plus-circle', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalAddZoneToCountry(\'' . $country_id . '\');"'), 'btn-info brn-sm') ?>
+            <?= tep_draw_button(sprintf(TEXT_INFO_HEADING_REMOVE_ALL_ZONES, $country_name), 'fas fa-trash', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalDeleteAllCountryZones(\'' . $country_id . '\');"'), 'btn-danger brn-sm mr-2') ?>
+            </div>
+          </div>
+        </div>
 <?php
+
+    $active = "";
+
   }
+  
 ?>
-              <tr>
-                <td colspan="4"><table border="0" width="100%" cellspacing="0" cellpadding="2">
-                  <tr>
-                    <td class="smallText" valign="top"><?php echo $zones_split->display_count($zones_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_ZONES); ?></td>
-                    <td class="smallText" align="right"><?php echo $zones_split->display_links($zones_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page']); ?></td>
-                  </tr>
+      </div>
+    </div>
+  </div>
+<script>
+function ModalDeleteAllCountryZones (country_id){
+
+console.log("999");
+  // Formulario
+  $("form > .modal-content").unwrap();
+  $(".modal-content").wrap('<form id="zones" name="zones" action="zones.php?action=zone_delete_all_confirm&country_id=' + country_id + '" method="post">')
+
+  // Botones
+  $("#ModalButtonCancel").show();
+  $("#ModalButtonSubmit").hide();
+  $("#ModalButtonSave").hide();
+  $("#ModalButtonDelete").show();
+
+
+  var params = {"country_id" : country_id, "action" : "zone_delete_all"};
+  $.ajax({
+    data:  params,
+    url:   'zones.php',
+    type:  'get',
+    cache: false,
+    beforeSend: function () {
+      $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+    },
+    success:  function (response) {
+      $(".modal-title").html($(response).filter('#title').html());
+      $(".modal-body").html($(response).filter('#content').html());
+      $("#zonesModal").modal('show');
+
+    }
+  });
+}
+
+function ModalAddZoneToCountry(country_id){
+
+  // Formulario
+  $("form > .modal-content").unwrap();
+    $(".modal-content").wrap('<form id="zones" name="zones" action="zones.php?action=zone_add" method="post">')
+
+  // Botones
+  $("#ModalButtonCancel").show();
+  $("#ModalButtonSubmit").show();
+  $("#ModalButtonSave").hide();
+  $("#ModalButtonDelete").hide();
+
+  var params = {"action" : "zone_add_to_country_get_form", "country_id" : country_id};
+  $.ajax({
+    data:  params,
+    url:   'zones.php',
+    type:  'get',
+    cache: false,
+    beforeSend: function () {
+      $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+    },
+    success:  function (response) {
+      $(".modal-title").html($(response).filter('#title').html());
+      $(".modal-body").html($(response).filter('#content').html());
+      $("#zonesModal").modal('show')
+
+    }
+  });
+}
+
+function ModalAddZone(){
+  // Formulario
+  $("form > .modal-content").unwrap();
+    $(".modal-content").wrap('<form id="zones" name="zones" action="zones.php?action=zone_add" method="post">')
+
+  // Botones
+  $("#ModalButtonCancel").show();
+  $("#ModalButtonSubmit").show();
+  $("#ModalButtonSave").hide();
+  $("#ModalButtonDelete").hide();
+
+  var params = {"action" : "zone_add_get_form"};
+  $.ajax({
+    data:  params,
+    url:   'zones.php',
+    type:  'get',
+    cache: false,
+    beforeSend: function () {
+      $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+    },
+    success:  function (response) {
+      $(".modal-title").html($(response).filter('#title').html());
+      $(".modal-body").html($(response).filter('#content').html());
+      $("#zonesModal").modal('show')
+
+    }
+  });
+}
+function ModalEditZone(zone_id){
+  // Formulario
+  $("form > .modal-content").unwrap();
+    $(".modal-content").wrap('<form id="zones" name="zones" action="zones.php?action=zone_edit" method="post">')
+
+  // Botones
+  $("#ModalButtonCancel").show();
+  $("#ModalButtonSubmit").show();
+  $("#ModalButtonSave").hide();
+  $("#ModalButtonDelete").hide();
+
+  var params = {"action" : "zone_edit_get_form", "zone_id" : zone_id};
+  $.ajax({
+    data:  params,
+    url:   'zones.php',
+    type:  'get',
+    cache: false,
+    beforeSend: function () {
+      $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+    },
+    success:  function (response) {
+      $(".modal-title").html($(response).filter('#title').html());
+      $(".modal-body").html($(response).filter('#content').html());
+      $("#zonesModal").modal('show');
+
+    }
+  });
+}
+function ModalDeleteZone(zone_id, country_id){
+  // Formulario
+  $("form > .modal-content").unwrap();
+  $(".modal-content").wrap('<form id="zones" name="zones" action="zones.php?action=zone_delete_confirm&zone_id=' + zone_id + '&country_id=' + country_id + '" method="post">')
+
+  // Botones
+  $("#ModalButtonCancel").show();
+  $("#ModalButtonSubmit").hide();
+  $("#ModalButtonSave").hide();
+  $("#ModalButtonDelete").show();
+
+
+  var params = {"zone_id" : zone_id, "action" : "zone_delete"};
+  $.ajax({
+    data:  params,
+    url:   'zones.php',
+    type:  'get',
+    cache: false,
+    beforeSend: function () {
+      $(".modal-body").html('<div class="text-center"><i class="fas fa-spinner fa-pulse fa-3x fa-fw text-info"></i><span class="sr-only">Loading...</span></div>');
+    },
+    success:  function (response) {
+      $(".modal-title").html($(response).filter('#title').html());
+      $(".modal-body").html($(response).filter('#content').html());
+      $("#zonesModal").modal('show');
+
+    }
+  });
+}
+</script>
 <?php
-  if (empty($action)) {
+
+  require ("includes/classes/modal.php");
+  
+  $modal = new modal();
+  $modal->button_save = true;
+  $modal->button_submit = true;
+  $modal->button_delete = true;
+  $modal->button_cancel = true;
+  $modal->output();
 ?>
-                  <tr>
-                    <td class="smallText" colspan="2" align="right"><?php echo tep_draw_button(IMAGE_NEW_ZONE, 'plus', tep_href_link('zones.php', 'page=' . $_GET['page'] . '&action=new')); ?></td>
-                  </tr>
-<?php
-  }
-?>
-                </table></td>
-              </tr>
-            </table></td>
-<?php
-  $heading = array();
-  $contents = array();
 
-  switch ($action) {
-    case 'new':
-      $heading[] = array('text' => '<strong>' . TEXT_INFO_HEADING_NEW_ZONE . '</strong>');
 
-      $contents = array('form' => tep_draw_form('zones', 'zones.php', 'page=' . $_GET['page'] . '&action=insert'));
-      $contents[] = array('text' => TEXT_INFO_INSERT_INTRO);
-      $contents[] = array('text' => '<br />' . TEXT_INFO_ZONES_NAME . '<br />' . tep_draw_input_field('zone_name'));
-      $contents[] = array('text' => '<br />' . TEXT_INFO_ZONES_CODE . '<br />' . tep_draw_input_field('zone_code'));
-      $contents[] = array('text' => '<br />' . TEXT_INFO_COUNTRY_NAME . '<br />' . tep_draw_pull_down_menu('zone_country_id', tep_get_countries()));
-      $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(IMAGE_SAVE, 'disk', null, 'primary') . tep_draw_button(IMAGE_CANCEL, 'close', tep_href_link('zones.php', 'page=' . $_GET['page'])));
-      break;
-    case 'edit':
-      $heading[] = array('text' => '<strong>' . TEXT_INFO_HEADING_EDIT_ZONE . '</strong>');
-
-      $contents = array('form' => tep_draw_form('zones', 'zones.php', 'page=' . $_GET['page'] . '&cID=' . $cInfo->zone_id . '&action=save'));
-      $contents[] = array('text' => TEXT_INFO_EDIT_INTRO);
-      $contents[] = array('text' => '<br />' . TEXT_INFO_ZONES_NAME . '<br />' . tep_draw_input_field('zone_name', $cInfo->zone_name));
-      $contents[] = array('text' => '<br />' . TEXT_INFO_ZONES_CODE . '<br />' . tep_draw_input_field('zone_code', $cInfo->zone_code));
-      $contents[] = array('text' => '<br />' . TEXT_INFO_COUNTRY_NAME . '<br />' . tep_draw_pull_down_menu('zone_country_id', tep_get_countries(), $cInfo->countries_id));
-      $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(IMAGE_SAVE, 'disk', null, 'primary') . tep_draw_button(IMAGE_CANCEL, 'close', tep_href_link('zones.php', 'page=' . $_GET['page'] . '&cID=' . $cInfo->zone_id)));
-      break;
-    case 'delete':
-      $heading[] = array('text' => '<strong>' . TEXT_INFO_HEADING_DELETE_ZONE . '</strong>');
-
-      $contents = array('form' => tep_draw_form('zones', 'zones.php', 'page=' . $_GET['page'] . '&cID=' . $cInfo->zone_id . '&action=deleteconfirm'));
-      $contents[] = array('text' => TEXT_INFO_DELETE_INTRO);
-      $contents[] = array('text' => '<br /><strong>' . $cInfo->zone_name . '</strong>');
-      $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(IMAGE_DELETE, 'trash', null, 'primary') . tep_draw_button(IMAGE_CANCEL, 'close', tep_href_link('zones.php', 'page=' . $_GET['page'] . '&cID=' . $cInfo->zone_id)));
-      break;
-    default:
-      if (isset($cInfo) && is_object($cInfo)) {
-        $heading[] = array('text' => '<strong>' . $cInfo->zone_name . '</strong>');
-
-        $contents[] = array('align' => 'center', 'text' => tep_draw_button(IMAGE_EDIT, 'document', tep_href_link('zones.php', 'page=' . $_GET['page'] . '&cID=' . $cInfo->zone_id . '&action=edit')) . tep_draw_button(IMAGE_DELETE, 'trash', tep_href_link('zones.php', 'page=' . $_GET['page'] . '&cID=' . $cInfo->zone_id . '&action=delete')));
-        $contents[] = array('text' => '<br />' . TEXT_INFO_ZONES_NAME . '<br />' . $cInfo->zone_name . ' (' . $cInfo->zone_code . ')');
-        $contents[] = array('text' => '<br />' . TEXT_INFO_COUNTRY_NAME . ' ' . $cInfo->countries_name);
-      }
-      break;
-  }
-
-  if ( (tep_not_null($heading)) && (tep_not_null($contents)) ) {
-    echo '            <td width="25%" valign="top">' . "\n";
-
-    $box = new box;
-    echo $box->infoBox($heading, $contents);
-
-    echo '            </td>' . "\n";
-  }
-?>
-          </tr>
-        </table></td>
-      </tr>
-    </table>
 
 <?php
   require('includes/template_bottom.php');
