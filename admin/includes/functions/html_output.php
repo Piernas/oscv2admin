@@ -304,7 +304,7 @@
 
     if (tep_not_null($parameters)) $field .= ' ' . $parameters;
 
-    (strpos($parameters , "class") !== false ) ?: $field .= ' class="form-control form-control-sm">';
+    (strpos($parameters , "class") !== false ) ? $field .= ">" : $field .= 'class="form-control form-control-sm">';
 
 
     if (empty($default) && ( (isset($_GET[$name]) && is_string($_GET[$name])) || (isset($_POST[$name]) && is_string($_POST[$name])) ) ) {
@@ -321,7 +321,7 @@
         $field .= ' selected="selected"';
       }
 
-      $field .= '>' . tep_output_string($values[$i]['text'], array('"' => '&quot;', '\'' => '&#039;', '<' => '&lt;', '>' => '&gt;')) . '</option>';
+      $field .= '>' . tep_output_string($values[$i]['text'], array('"' => '&quot;', '\'' => '&#039;', '<' => '&lt;', '>' => '&gt;')) . '</option>' . PHP_EOL;
     }
     $field .= '</select>';
 
