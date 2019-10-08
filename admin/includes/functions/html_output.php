@@ -332,12 +332,14 @@
 
 ////
 // Output a Bootstrap Button
-  function tep_draw_button($title = null, $icon = null, $link = null, $priority = null, $params = array(), $style = null) {
+  function tep_draw_button($title = null, $icon = null, $link = null, $priority = null, $params = null, $style = null) {
     static $button_counter = 1;
 
     $types = array('submit', 'button', 'reset');
+    
+    if ( !is_array($params) ) $params = array();
 
-    if (!isset($params['type']) || ($params['type']) == "" ) {
+    if ( !isset($params['type']) ) {
       $params['type'] = 'submit';
     }
 
@@ -348,19 +350,18 @@
     if ( ($params['type'] == 'submit') && isset($link) ) {
       $params['type'] = 'button';
     }
-/*
-removed (unused property from jquery UI)
+
     if (!isset($priority)) {
       $priority = 'secondary';
     }
-*/
+
     $button = NULL;
 
     if ( ($params['type'] == 'button') && isset($link) ) {
       $button .= '<a id="btn' . $button_counter . '" href="' . $link . '"';
 
       if ( isset($params['newwindow']) ) {
-        $button .= ' target="_blank"';
+        $button .= ' target="_blank" rel="noopener"';
       }
     } else {
       $button .= '<button ';
@@ -373,12 +374,12 @@ removed (unused property from jquery UI)
 
     $button .= ' class="btn ';
 
-    $button .= (isset($style)) ? $style : 'btn-outline-primary';
+    $button .= (isset($style)) ? $style : 'btn-info btn-sm';
 
     $button .= '">';
 
     if (isset($icon) && tep_not_null($icon)) {
-      $button .= ' <span class="' . $icon . '"></span> ';
+      $button .= ' <span class="' . $icon . '" aria-hidden="true"></span> ';
     }
 
     $button .= $title;
