@@ -27,10 +27,10 @@
   <div class="card my-3">
     <div class="card-header" id="page-heading">
       <div class="d-flex justify-content-between">
-        <div class="mr-auto p-2 pageHeading">
+        <div class="mr-auto pageHeading">
           <?php echo sprintf(TITLE_CONFIGURATION ,$cfg_group['configuration_group_title']); ?>
         </div>
-        <div class="py-2 pr-2">
+        <div class=" pr-2">
               <div class="input-group input-group-sm">
                 <div class="input-group-prepend">
                   <span class="input-group-text bg-info text-white"><i class="fas fa-forward fa-lg"></i></span>
@@ -38,7 +38,7 @@
           <?= tep_draw_pull_down_menu('configuration_group_selection', $groups_list, $gID)?>
           </div>
         </div>
-        <div class="py-2">
+        <div>
           <a class="btn btn-info btn-sm" href="javascript:DisplaySetup();"><i class="fas fa-cog"></i></a>
         </div>
       </div>

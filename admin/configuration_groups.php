@@ -4,14 +4,12 @@
   require('includes/template_top.php');
 
 ?>
-
-  <div class="row">
-    <div class="col-12">
+  <div class="card my-3">
+    <div class="card-header" id="page-heading"> 
       <h1 class="pageHeading"><i class="fa fa-cog"></i> <?= HEADING_TITLE?> </h1>
     </div>
-  </div>
-
-  <div class="row">
+    <div class="card-body" id="page-content"> 
+      <div class="row">
 
 <?php
 
@@ -20,17 +18,21 @@
     if (key_exists ('icon', $group )) $group_icon ='<i class="' . $group['icon'] . ' fa-lg"></i> ';
   
 ?>
-  <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-    <div class="alert alert-info text-center full-height">
-      <a href="<?= $group['link'] ?>" class="alert-link"><?= $group_icon . $group['title'] ?></a>
-      <p><?= $group['description'] ?></p>
-    </div>
-  </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 pb-3">
+          <div class="card text-center">
+            <div class="card-header card-modules"><a href="<?= $group['link'] ?>" class="alert-link"><?= $group_icon . $group['title'] ?></a></div>
+            <div class="card-body">
+              
+              <p><?= $group['description'] ?></p>
+            </div>
+          </div>
+        </div>
 <?php
 
   }
 ?>
-  </div>
+      </div>    </div>
+  </div>
 <?php
 
   require('includes/template_bottom.php');
