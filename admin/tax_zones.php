@@ -78,18 +78,19 @@
 
       if (!$tax_zones_array[$tax_zone_id]['geo_zone_countries']) {
 ?>
-      <div class="alert alert-warning">NO HAY PAISES EN ESTA ZONA DE IMPUESTOS"</div>
+      <div class="alert alert-warning"><?= MESSAGE_NO_COUNTRIES_IN_TAX_ZONE ?></div>
 <?php
       }
 
     foreach ($tax_zones_array[$tax_zone_id]['geo_zone_countries'] as $country_key => $country_values) {
 
 ?>
-  <h3><?= $country_values['country_name'] ?></h1>
+  <h3><span class="flag-icon flag-icon-<?= strtolower( $country_values['country_iso_code_2']) ?> mr-3"></span><?= $country_values['country_name'] ?></h3>
           <table class="table table-sm">
             <thead>
               <tr class="table-info">
-              <td>Zona</td>
+              <td><?= TABLE_HEADING_ZONE ?></td>
+              <td class="actions"><?= TABLE_HEADING_ACTION ?></td>
               </tr>
             </thead>
           <tbody>
@@ -102,6 +103,8 @@
 ?>
             <tr>
               <td><?= $zone_values['zone_name'] ?></td>
+              <td class="actions"><a href="javascript:ModalDeleteCountry(<?= $country['countries_id'] ?>);"><i class="fas fa-trash fa-lg text-danger"></i></a></td>
+
             </tr>
           
           
@@ -132,9 +135,12 @@
 
 <?php
 
-  echo '<pre>';
+  //echo '<pre>';
 //  print_r ( $tax_zones_class->tax_zones);
-  echo "</pre>";
+  //echo "</pre>";
+
+  $stylesheet = '<link rel="stylesheet" href="' . tep_catalog_href_link ( 'ext/flag-icon-css/css/flag-icon.min.css') . '">' . PHP_EOL;
+  $oscTemplate->addBlock($stylesheet, 'admin_footer_scripts');
 
 
 

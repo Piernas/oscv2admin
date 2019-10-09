@@ -14,3 +14,5 @@
  
   define('HEADING_TITLE','Tax zones');
   define('HEADING_TITLE_SEARCH','Search');
+  define('MESSAGE_NO_COUNTRIES_IN_TAX_ZONE','There are no counrty zones in this tax zone. Please add a zone.');
+  define('TABLE_HEADING_ZONE', 'Country zone');

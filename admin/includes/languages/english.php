@@ -312,3 +312,5 @@ define('TEXT_AJAX_WAIT', 'Please wait...');
 define('IMAGE_CLOSE', 'Close');
 
 define('TABLE_HEADING_ACTION', 'Action');
+define('TEXT_ALL_ZONES', 'All zones from country');
+
