@@ -20,13 +20,16 @@ body { font-family: Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif; /*f
 .nav-pills .nav-link {
   margin: 2px;
 }
-
+.tooltip{
+  z-index:100000000;
+}
 .nav-pills .nav-link:not(.active) {
   background-color:rgb(230, 240, 240); 
 }
 
 #BodyContent {
   background-color:Gainsboro;
+  margin-bottom: 35px;
 }
 
 .card-modules{
