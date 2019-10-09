@@ -18,7 +18,7 @@
   if (tep_not_null($action)) {
     switch ($action) {
       
-      case 'zone_add_get_form':
+      case 'zone_add_form':
       
         $zones_countries = $zones->get_no_zone_countries();
         
@@ -45,7 +45,7 @@
         tep_redirect(tep_href_link('zones.php?country_id=' . $zone_country_id));
         break;
       
-      case 'zone_add_to_country_get_form':
+      case 'zone_add_to_country_form':
         $country_id = (int)$_GET['country_id'];
         $zones_controls = '<div class="form-group"><label>' . TEXT_INFO_ZONES_NAME . '</label>' . tep_draw_input_field('zone_name', '','required="true"') . '</div>';
         $zones_controls .= '<div class="form-group"><label>' . TEXT_INFO_ZONES_CODE . '</label>' . tep_draw_input_field('zone_code', '') . '</div>';
@@ -58,7 +58,7 @@
         break;
 
 
-      case 'zone_edit_get_form':
+      case 'zone_edit_form':
         $zone_id = tep_db_prepare_input($_GET['zone_id']);
         $zone_data = $zones->get_zone_data($zone_id);
         $zones_controls = "";
@@ -139,7 +139,7 @@
     <div class="card-header" id="page-heading">
       <div class="d-flex justify-content-between">
         <div class="mr-auto pageHeading"><i class="fas fa-cogs"></i>&nbsp;<?= HEADING_TITLE ?></div>
-        <div><?= tep_draw_button(TEXT_INFO_HEADING_NEW_ZONE_COUNTRY, 'fas fa-plus-circle', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalAddZone();"'), 'btn-info brn-sm') ?></div>
+        <div><?= tep_draw_button(TEXT_INFO_HEADING_NEW_ZONE_COUNTRY, 'fas fa-plus-circle', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalAddZone();"'), 'btn-info btn-sm') ?></div>
       </div>
     </div>
 
@@ -211,8 +211,8 @@
           </table>
           <div>
             <div class=" float-right">
-            <?= tep_draw_button(sprintf(TEXT_INFO_HEADING_NEW_ZONE_IN_COUNTRY, $country_name), 'fas fa-plus-circle', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalAddZoneToCountry(\'' . $country_id . '\');"'), 'btn-info brn-sm') ?>
-            <?= tep_draw_button(sprintf(TEXT_INFO_HEADING_REMOVE_ALL_ZONES, $country_name), 'fas fa-trash', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalDeleteAllCountryZones(\'' . $country_id . '\');"'), 'btn-danger brn-sm mr-2') ?>
+            <?= tep_draw_button(sprintf(TEXT_INFO_HEADING_NEW_ZONE_IN_COUNTRY, $country_name), 'fas fa-plus-circle', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalAddZoneToCountry(\'' . $country_id . '\');"'), 'btn-info btn-sm') ?>
+            <?= tep_draw_button(sprintf(TEXT_INFO_HEADING_REMOVE_ALL_ZONES, $country_name), 'fas fa-trash', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalDeleteAllCountryZones(\'' . $country_id . '\');"'), 'btn-danger btn-sm mr-2') ?>
             </div>
           </div>
         </div>
@@ -228,8 +228,6 @@
   </div>
 <script>
 function ModalDeleteAllCountryZones (country_id){
-
-console.log("999");
   // Formulario
   $("form > .modal-content").unwrap();
   $(".modal-content").wrap('<form id="zones" name="zones" action="zones.php?action=zone_delete_all_confirm&country_id=' + country_id + '" method="post">')
@@ -271,7 +269,7 @@ function ModalAddZoneToCountry(country_id){
   $("#ModalButtonSave").hide();
   $("#ModalButtonDelete").hide();
 
-  var params = {"action" : "zone_add_to_country_get_form", "country_id" : country_id};
+  var params = {"action" : "zone_add_to_country_form", "country_id" : country_id};
   $.ajax({
     data:  params,
     url:   'zones.php',
@@ -300,7 +298,7 @@ function ModalAddZone(){
   $("#ModalButtonSave").hide();
   $("#ModalButtonDelete").hide();
 
-  var params = {"action" : "zone_add_get_form"};
+  var params = {"action" : "zone_add_form"};
   $.ajax({
     data:  params,
     url:   'zones.php',
@@ -328,7 +326,7 @@ function ModalEditZone(zone_id){
   $("#ModalButtonSave").hide();
   $("#ModalButtonDelete").hide();
 
-  var params = {"action" : "zone_edit_get_form", "zone_id" : zone_id};
+  var params = {"action" : "zone_edit_form", "zone_id" : zone_id};
   $.ajax({
     data:  params,
     url:   'zones.php',
