@@ -32,8 +32,11 @@ body { font-family: Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif; /*f
   margin-bottom: 35px;
 }
 
-.card-modules{
+.card-modules, .tab-heading{
   background-color: lightblue;
+}
+.tab-heading {
+  
 }
 
 #page-heading, #page-footer {
