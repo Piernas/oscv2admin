@@ -1,8 +1,14 @@
 <?php
 /*
  *
+ * countries.php
+ *
+ * General purpose class for handling countries and zones
+ *
  * Copyright 2019 Juan Manuel de Castro
  * Released under the GPL v3.0 License
+ *
+ *
  *
  */
   class countries {
@@ -20,6 +26,56 @@
       }
       return $countries_list;
     }
+
+    function get_countries_details () {
+      $countries_query = tep_db_query("select * from " . TABLE_COUNTRIES . " order by countries_name");
+      while ($countries = tep_db_fetch_array($countries_query)) {
+       $countries_list[$countries['countries_id']] = array('countries_id' =>$countries['countries_id'],
+                                                           'countries_name' =>$countries['countries_name'],
+                                                           'countries_iso_code_2' =>$countries['countries_iso_code_2'],
+                                                           'countries_iso_code_3' =>$countries['countries_iso_code_3'],
+                                                           'address_format_id' =>$countries['address_format_id']
+                                                          );
+      }
+      return $countries_list;
+    }
+    
+    ////
+    // Edits a country:
+    function edit_country ($countries_id, $countries_name, $countries_iso_code_2, $countries_iso_code_3, $address_format_id) {
+      tep_db_query("update " . TABLE_COUNTRIES . " set countries_iso_code_2 = '" . tep_db_input($countries_iso_code_2) . "', countries_iso_code_3 = '" . tep_db_input($countries_iso_code_3) . "', address_format_id = '" . tep_db_input($address_format_id) . "', countries_name = '" . tep_db_input($countries_name) . "' where countries_id = '" . (int)$countries_id . "'");
+    }
+    
+    ////
+    // Adds a new country
+    function add_country($countries_name, $countries_iso_code_2, $countries_iso_code_3, $address_format_id){
+      echo "insert into " . TABLE_COUNTRIES . " (countries_name, countries_iso_code_2, countries_iso_code_3, address_format_id) values ('" . tep_db_input($countries_name) . "', '" . tep_db_input($countries_iso_code_2) . "', '" . tep_db_input($countries_iso_code_3) . "', '" . tep_db_input($address_format_id) . "')";
+      tep_db_query("insert into " . TABLE_COUNTRIES . " (countries_name, countries_iso_code_2, countries_iso_code_3, address_format_id) values ('" . tep_db_input($countries_name) . "', '" . tep_db_input($countries_iso_code_2) . "', '" . tep_db_input($countries_iso_code_3) . "', '" . tep_db_input($address_format_id) . "')");
+      
+      
+    }
+    
+    
+    ////
+    // Removes a country
+    function remove_country ($countries_id) {
+      tep_db_query("delete from " . TABLE_COUNTRIES . " where countries_id = '" . (int)$countries_id . "'");
+    }
+
+/*
+ * ADDRESS FORMAT METHODS
+*/
+    ////
+    // Returns an array with address formats # and format
+    function get_address_format_list () {
+      $address_format_query = tep_db_query("select * from " . TABLE_ADDRESS_FORMAT . " order by address_format_id");
+      
+      while ($address_format = tep_db_fetch_array($address_format_query)) {
+        $address_format_array[$address_format['address_format_id']] = $address_format['address_format'];
+      }
+      return $address_format_array;
+    }
+
 
 /*
  * ZONE METHODS
