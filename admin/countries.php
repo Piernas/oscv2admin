@@ -128,49 +128,6 @@
         $messageStack->add_session(sprintf (MESSAGE_COUNTRY_DELETED, $country_name),'success');
         tep_redirect(tep_href_link('countries.php'));
         break;
-
-
-
-
-
-
-
-
-
-
-
-      /*
-
-
-      case 'insert':
-        $countries_name = tep_db_prepare_input($_POST['countries_name']);
-        $countries_iso_code_2 = tep_db_prepare_input($_POST['countries_iso_code_2']);
-        $countries_iso_code_3 = tep_db_prepare_input($_POST['countries_iso_code_3']);
-        $address_format_id = tep_db_prepare_input($_POST['address_format_id']);
-
-        tep_db_query("insert into " . TABLE_COUNTRIES . " (countries_name, countries_iso_code_2, countries_iso_code_3, address_format_id) values ('" . tep_db_input($countries_name) . "', '" . tep_db_input($countries_iso_code_2) . "', '" . tep_db_input($countries_iso_code_3) . "', '" . (int)$address_format_id . "')");
-
-        tep_redirect(tep_href_link('countries.php'));
-        break;
-      case 'save':
-        $countries_id = tep_db_prepare_input($_GET['cID']);
-        $countries_name = tep_db_prepare_input($_POST['countries_name']);
-        $countries_iso_code_2 = tep_db_prepare_input($_POST['countries_iso_code_2']);
-        $countries_iso_code_3 = tep_db_prepare_input($_POST['countries_iso_code_3']);
-        $address_format_id = tep_db_prepare_input($_POST['address_format_id']);
-
-        tep_db_query("update " . TABLE_COUNTRIES . " set countries_name = '" . tep_db_input($countries_name) . "', countries_iso_code_2 = '" . tep_db_input($countries_iso_code_2) . "', countries_iso_code_3 = '" . tep_db_input($countries_iso_code_3) . "', address_format_id = '" . (int)$address_format_id . "' where countries_id = '" . (int)$countries_id . "'");
-
-        tep_redirect(tep_href_link('countries.php', 'page=' . $_GET['page'] . '&cID=' . $countries_id));
-        break;
-      case 'deleteconfirm':
-        $countries_id = tep_db_prepare_input($_GET['cID']);
-
-        tep_db_query("delete from " . TABLE_COUNTRIES . " where countries_id = '" . (int)$countries_id . "'");
-
-        tep_redirect(tep_href_link('countries.php', 'page=' . $_GET['page']));
-        break;
-        */
     }
   }
 
@@ -222,6 +179,9 @@
     }
 
 /////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 
 ?>
               <tr class="clickable">
@@ -247,23 +207,6 @@
   </div>
   </div>
 <?php
-/*
-  $heading = array();
-  $contents = array();
-
-  switch ($action) {
-    case 'new':
-      $heading[] = array('text' => '<strong>' . TEXT_INFO_HEADING_NEW_COUNTRY . '</strong>');
-
-      $contents = array('form' => tep_draw_form('countries', 'countries.php', 'page=' . $_GET['page'] . '&action=insert'));
-      $contents[] = array('text' => TEXT_INFO_INSERT_INTRO);
-      $contents[] = array('text' => '<br />' . TEXT_INFO_COUNTRY_NAME . '<br />' . tep_draw_input_field('countries_name'));
-      $contents[] = array('text' => '<br />' . TEXT_INFO_COUNTRY_CODE_2 . '<br />' . tep_draw_input_field('countries_iso_code_2'));
-      $contents[] = array('text' => '<br />' . TEXT_INFO_COUNTRY_CODE_3 . '<br />' . tep_draw_input_field('countries_iso_code_3'));
-      $contents[] = array('text' => '<br />' . TEXT_INFO_ADDRESS_FORMAT . '<br />' . tep_draw_pull_down_menu('address_format_id', tep_get_address_formats()));
-      $contents[] = array('align' => 'center', 'text' => '<br />' . tep_draw_button(IMAGE_SAVE, 'disk', null, 'primary') . tep_draw_button(IMAGE_CANCEL, 'close', tep_href_link('countries.php', 'page=' . $_GET['page'])));
-      break;
-*/
 
   require ("includes/classes/modal.php");
 
