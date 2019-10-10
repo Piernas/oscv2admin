@@ -117,11 +117,11 @@
 
       if (!$tax_zones_array[$tax_zone_id]['geo_zone_countries']) {
 ?>
-      <div class="alert alert-warning"><?= MESSAGE_NO_COUNTRIES_IN_TAX_ZONE ?></div>
+      <div class="alert alert-warning  mt-3"><?= MESSAGE_NO_COUNTRIES_IN_TAX_ZONE ?></div>
 <?php
       }
 
-    foreach ($tax_zones_array[$tax_zone_id]['geo_zone_countries'] as $country_key => $country_values) {
+      foreach ($tax_zones_array[$tax_zone_id]['geo_zone_countries'] as $country_key => $country_values) {
 
 ?>
 
@@ -133,6 +133,10 @@
             <?= tep_draw_button(IMAGE_REMOVE, 'fas fa-plus-circle fa-lg', null, null, array('type' => 'button', 'params' => 'onclick="javascript:ModalAddCountry();"'), 'btn-info btn-danger') ?>
             </div>
           </div>
+<?php
+        if ($tax_zones_class->country_has_zones($country_key) > 0) {
+?>
+          
           <table class="table table-sm">
             <thead>
               <tr class="table-info">
@@ -143,11 +147,11 @@
             </thead>
           <tbody>
 <?php
-
+// check to see if country has zones and remove table if not
     foreach ($tax_zones_array[$tax_zone_id]['geo_zone_countries'][$country_key]['country_zones'] as $zone_key => $zone_values) {
 
 // print_r ($zone_values);
-
+  
 ?>
             <tr id="tax_zone_<?= $zone_values['association_id'] ?>">
               <td><?= $zone_key ?></td>
@@ -160,37 +164,37 @@
 <?php
 
     }
+    if ($zone_key != 0 ) {
 ?>
-            <tr class="table-info">
-              <td></td>
-
-              <td class="text-right">*Select more zones from this country</td>
-              <td class="actions"><i class="fas fa-caret-square-down fa-lg text-primary"></i></a></td>
-
+            <tr class="table-light">
+              <td colspan="3" class="actions"><span class="pr-3">*Add more zones from this country</span><i class="fas fa-caret-square-down fa-lg text-primary"></i></td>
             </tr>
 <?php
-    $remaining_zones = $tax_zones_class->get_remaining_zones($country_key,$tax_zone_id);
+      $remaining_zones = $tax_zones_class->get_remaining_zones($country_key,$tax_zone_id);
 
-    foreach ($remaining_zones as $zone_key => $zone_name) {
+      foreach ($remaining_zones as $zone_key => $zone_name) {
 ?>
 
-            <tr class="table-warning unused-zone">
+            <tr class="table-warning unused-zone d-none">
               <td><?= $zone_key ?></td>
               <td><?= $zone_name ?></td>
               <td class="actions"><a href="javascript:ModalAddZone(<?= $zone_values['association_id'] ?>);"><i class="fas fa-plus-circle fa-lg text-info"></i></a></td>
 
-            </tr><?php
+            </tr>
+<?php
+      }
     }
 ?>
           </tbody>
           </table>
 
 <?php
+        }
 // echo "> " .count($tax_zones_array[$tax_zone_id]['geo_zone_countries']) . "<";
 
 
 
-    }
+      }
 ?>
           </div>
 <?php

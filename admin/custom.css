@@ -38,6 +38,9 @@ body { font-family: Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif; /*f
 .tab-heading {
   
 }
+tr {
+  background-color: #fefdee;
+}
 
 #page-heading, #page-footer {
   background-color: LightBlue;

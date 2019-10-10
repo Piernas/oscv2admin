@@ -61,7 +61,6 @@
       }
     }
 
-
     function get_remaining_zones ($country_id, $tax_zone_id) {
       $returned = array();
 
@@ -94,6 +93,11 @@
       tep_db_query("delete from zones_to_geo_zones where association_id = '" . (int)$association_id . "'");
     }
 
+    function country_has_zones ($country_id) {
+      $num_zones_query = tep_db_query ('SELECT COUNT(*) as num_zones FROM zones WHERE zone_country_id = ' . (int)$country_id);
+      $num_zones = tep_db_fetch_array($num_zones_query);
+      return $num_zones['num_zones'];
+    }
     function zones_to_add () {
 
     }

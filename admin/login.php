@@ -35,7 +35,8 @@
 
         $actionRecorder = new actionRecorderAdmin('ar_admin_login', null, $username);
 
-        if ($actionRecorder->canPerform()) {
+        if (!defined('MODULE_ACTION_RECORDER_ADMIN_LOGIN_MINUTES') || $actionRecorder->canPerform()) {
+          // if undefined the module is not installed so it will allow login
           $check_query = tep_db_query("select id, user_name, user_password from " . TABLE_ADMINISTRATORS . " where user_name = '" . tep_db_input($username) . "'");
 
           if (tep_db_num_rows($check_query) == 1) {
