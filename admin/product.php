@@ -61,52 +61,108 @@
   }
 ?>
     <?php echo tep_draw_form('new_product', 'product.php', 'cPath=' . $cPath . (isset($_GET['pID']) ? '&pID=' . $_GET['pID'] : '') . '&action=' . $form_action, 'post', 'enctype="multipart/form-data"'); ?>
+    <div class="card my-3">
+      <div id="page-heading" class="card-header">
+        <div class="d-flex justify-content-between">
+          <div class="col-sm-8 pageHeading"><?= $title ?></div>
+          <div class="col-sm-4 pageHeading  text-right"><?= tep_draw_button(IMAGE_SAVE, 'fa fa-floppy-o') . tep_draw_button(IMAGE_CANCEL, 'fa fa-times', tep_href_link('categories.php', 'cPath=' . $cPath . (isset($_GET['pID']) ? '&pID=' . $_GET['pID'] : ''))); ?></div>
+        </div>
+      </div>
+      <div id="tabs-heading" class="card-header">
 
-    <div class="row">
-      <div class="col-sm-8 pageHeading"><?= $title ?></div>
-      <div class="col-sm-4 pageHeading  text-right"><?= tep_draw_button(IMAGE_SAVE, 'fa fa-floppy-o') . tep_draw_button(IMAGE_CANCEL, 'fa fa-times', tep_href_link('categories.php', 'cPath=' . $cPath . (isset($_GET['pID']) ? '&pID=' . $_GET['pID'] : ''))); ?></div>
-    </div>
-
-
-    <div id="productTabs">
-      <ul id="productTabsMain" class="nav nav-pills">
-        <li class="nav-item"><a class="nav-link active" href="#section_general_content" data-toggle="tab"><?= SECTION_HEADING_GENERAL ?></a></li>
-        <li class="nav-item"><a class="nav-link" href="#section_seo_content" data-toggle="tab"><?= SECTION_HEADING_SEO ?></a></li>
-        <li class="nav-item"><a class="nav-link" href="#section_data_content" data-toggle="tab"><?= SECTION_HEADING_DATA ?></a></li>
-        <li class="nav-item"><a class="nav-link" href="#section_images_content" data-toggle="tab"><?= SECTION_HEADING_IMAGES ?></a></li>
+      <ul id="productTabsMain" class="nav nav-tabs">
+        <li class="nav-item"><a class="nav-link active" data-target="#section_general_content" data-toggle="tab"><?= SECTION_HEADING_GENERAL ?></a></li>
+        <li class="nav-item"><a class="nav-link" data-target="#section_seo_content" data-toggle="tab"><?= SECTION_HEADING_SEO ?></a></li>
+        <li class="nav-item"><a class="nav-link" data-target="#section_data_content" data-toggle="tab"><?= SECTION_HEADING_DATA ?></a></li>
+        <li class="nav-item"><a class="nav-link" data-target="#section_images_content" data-toggle="tab"><?= SECTION_HEADING_IMAGES ?></a></li>
       </ul>
+      </div>
 
       <div class="tab-content">
         <div id="section_general_content" class="tab-pane fade show active" role="tabpanel">
           <div class="card">
             <div class="card-body">
               <div id="productLanguageTabs">
-                <ul class="nav nav-pills">
 <?php
+/*
+                <ul class="nav nav-pills">
+
     for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 ?>
                   <li class="nav-item"><a class="nav-link<?= ($i === 0 ? ' active' : '') ?>" data-target="#section_general_content_<?= $languages[$i]['directory'] ?>" data-toggle="tab"><?= tep_image(tep_catalog_href_link('includes/languages/' . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], '', 'SSL'), $languages[$i]['name'], '','','',false) . '&nbsp;' . $languages[$i]['name'] ?></a></li>
 <?php
     }
-?>
-                </ul>
 
+                </ul>
+    */
+?>
                 <div class="tab-content">
 <?php
     for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
+      
+      if (sizeof($languages) > 1) {
+        $language_identifier = '<div class="input-group-prepend"><span class="input-group-text">' . $languages[$i]['code'] . '</span></div>';
+      } else {
+        $language_identifier ="";
+      }
 ?>
-                  <div id="section_general_content_<?php echo $languages[$i]['directory']; ?>" class="tab-pane <?= ($i === 0 ? 'active' : ''); ?>">
-                    <div class="form-group">
-                      <label><?= TEXT_PRODUCTS_NAME ?></label><?= tep_draw_input_field('products_name[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : $product->description[$languages[$i]['id']]['products_name']), 'required'); ?>
-                    </div>
+      <div class="row">
+        <div class="col-md-6 col-lg-4">
+          <label><?= TEXT_PRODUCTS_NAME ?></label>
+          <div class="form-group">
+            <div class="input-group input-group-sm">
+              
+              <?= $language_identifier . tep_draw_input_field('products_name[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : $product->description[$languages[$i]['id']]['products_name']), 'required'); ?>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <label><?= TEXT_PRODUCTS_SEO_TITLE ?></label>
+          <div class="form-group">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend"><span class="input-group-text"><?= $languages[$i]['code'] ?></span></div>
+              <?= tep_draw_input_field('products_seo_title[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' :$product->description[$languages[$i]['id']]['products_seo_title'])) ?>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <label><?= TEXT_PRODUCTS_SEO_KEYWORDS ?></label>
+          <div class="form-group">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend"><span class="input-group-text"><?= $languages[$i]['code'] ?></span></div>
+              <?= tep_draw_input_field('products_url[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : stripslashes($product->description[$languages[$i]['id']]['products_url']))); ?>
+            </div>
+          </div>
+        </div>
+      </div>
+<?php
+    }
+?>
+    <div class="row">
+<?php
+    for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
+?>
+      <div class="col-lg-6">
+      <div class="form-group">
+        <label><?= TEXT_PRODUCTS_DESCRIPTION . '(' . $languages[$i]['name'] . ')' ?></label><?= tep_draw_textarea_field('products_description[' . $languages[$i]['id'] . ']', null, '70', '7', (empty($product->products_id) ? '' : $product->description[$languages[$i]['id']]['products_description']), 'data-edit="editable"'); ?>
+      </div>
+      </div>
+<?php
+    }
+?>
 
-                    <div class="form-group">
-                      <label><?= TEXT_PRODUCTS_DESCRIPTION ?></label><?= tep_draw_textarea_field('products_description[' . $languages[$i]['id'] . ']', null, '70', '10', (empty($product->products_id) ? '' : $product->description[$languages[$i]['id']]['products_description'])); ?>
-                    </div>
-                    <div class="form-group">
-                      <label><?= TEXT_PRODUCTS_URL . ' <small>' . TEXT_PRODUCTS_URL_WITHOUT_HTTP . '</small>' ?></label><?= tep_draw_input_field('products_url[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : stripslashes($product->description[$languages[$i]['id']]['products_url']))); ?>
-                    </div>
-                  </div>
+                </div>
+
+
+<?php
+
+    for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
+
+?>
+      
+      <div class="form-group">
+        <label><?= TEXT_PRODUCTS_URL . '(' . $languages[$i]['name'] . ')' . ' <small>' . TEXT_PRODUCTS_URL_WITHOUT_HTTP . '</small>' ?></label><?= tep_draw_input_field('products_url[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : stripslashes($product->description[$languages[$i]['id']]['products_url']))); ?>
+      </div>
 <?php
     }
 ?>
@@ -120,7 +176,7 @@
           <div class="card">
             <div class="card-body">
               <div id="seoLanguageTabs">
-                <ul class="nav nav-pills">
+                <ul class="nav nav-tabs">
 <?php
     for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 ?>
@@ -144,7 +200,7 @@
                       </div>
                       <div class="form-group">
                        <label><?= TEXT_PRODUCTS_SEO_KEYWORDS ?> <i class="fa fa-info-circle fa-lg text-info" title="<?= TEXT_PRODUCTS_SEO_KEYWORDS_TOOLTIP?>" data-toggle="tooltip"></i></label><?= tep_draw_input_field('products_seo_keywords[' . $languages[$i]['id'] . ']', $product->description[$languages[$i]['id']]['products_seo_keywords'], 'placeholder="' . PLACEHOLDER_COMMA_SEPARATION . '"'); ?>
-                    </div>
+                      </div>
                   </div>
 <?php
     }
@@ -383,4 +439,53 @@ $(document).on("click", "#ModalButtonDelete", function(event){
 
 });
 
+</script>
+<script>
+/*
+$(":submits").click(function () {
+    $('input:invalid').each(function () {
+        // Find the tab-pane that this element is inside, and get the id
+        var closest = $(this).closest('.tab-pane');
+        var id = closest.attr('id');
+        // Find the link that corresponds to the pane and have it show
+        $('a[data-target="#' + id + '"]').tab('show');
+
+        // Only want to do it once
+        return false;
+    });
+});
+*/
+$(":submit").click(function () {
+    $('input:invalid').each(function () {
+        // Find the tab-pane that this element is inside, and get the id
+        var closest1 = $(this).closest('.tab-pane');
+        var id1 = closest1.attr('id');
+        var closest2 = closest1.parent().closest('.tab-pane');
+        var id2 = closest2.attr('id');
+console.log (id1 +id2);
+        
+        // Find the link that corresponds to the pane and have it show
+        $('a[data-target="#' + id1 + '"]').tab('show');
+
+        $('a[data-target="#' + id2 + '"]').tab('show');
+
+        // Only want to do it once
+        return false;
+    });
+});
+  tinymce.init({
+    selector: 'textarea[data-edit="editable"]',
+    menubar:false,
+    statusbar: false,
+    height: 500,
+    forced_root_block : 'p',
+    theme: 'silver',
+    plugins: [
+      'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+      'searchreplace wordcount visualblocks visualchars code fullscreen',
+      'insertdatetime media nonbreaking save table contextmenu directionality',
+      'emoticons template paste colorpicker textpattern imagetools codesample toc'
+    ],
+    toolbar1: 'styleselect fontsizeselect| bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image '
+   });
 </script>
