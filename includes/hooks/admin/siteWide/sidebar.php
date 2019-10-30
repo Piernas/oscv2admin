@@ -170,20 +170,7 @@ $active_group = "";
             $active_app ="";
           }
         } elseif ($app['code'] == 'paypal.php') {
-          /*
-          $parameters = parse_url($app['link']);
-          parse_str($parameters['query'], $query);
-          if ($query['action'] == $_GET['action']) {
-            $active_app =" active";
-            $active_app_title = $app['title'];
-          } else {
-            $active_app ="";
-          }
-          */
           $active_app ="";
-
-          
-          
         } else {
           if ($app['code'] == $PHP_SELF) {
             $active_app =" active";
@@ -224,17 +211,15 @@ $active_group = "";
     global $active_app_title;
     $page_title = $active_app_title . " - " . STORE_NAME;
 
-?>
-<script>
-//  $("sidebar-wrapper").removeClass("preload");
-//     localStorage.setItem('oscSidebar', "");
 
+$this->listen_injectSiteEnd = <<<EOD
+<script>
  swapCollapseButton();
  
   $(document).ready(function() {
     $("body").removeClass("preload");
      initMenu();
-     document.title = '<?=  $page_title ?>';
+     document.title = "$page_title";
   });
 
   $("#menu-toggle").click(function(e) {
@@ -246,21 +231,21 @@ $active_group = "";
   $("#sidebar-collapse").click(function(e) {
      e.preventDefault();
      $("#sidebar-wrapper").toggleClass("toggled-large");
-     $('#menu ul').hide();
-     localStorage.setItem('oscSidebar', $("#sidebar-wrapper").attr('class'));
+     $("#menu ul").hide();
+     localStorage.setItem("oscSidebar", $("#sidebar-wrapper").attr("class"));
      swapCollapseButton();
  });
 
- $('#sidebar-wrapper').mouseleave(
+ $("#sidebar-wrapper").mouseleave(
     function() {
-    $('#sidebar-wrapper.toggled-large #menu ul').hide("slow");
+    $("#sidebar-wrapper.toggled-large #menu ul").hide("slow");
     }
  );
 
 function swapCollapseButton () {
-  sidebarState =localStorage.getItem('oscSidebar');
+  sidebarState =localStorage.getItem("oscSidebar");
   console.log ("SWapcollapse: " + sidebarState);
-  console.log ($("#sidebar-wrapper").attr('class'));
+  console.log ($("#sidebar-wrapper").attr("class"));
   if ( sidebarState =="toggled toggled-large") {
     $("#sidebar-collapse-content").html ('<span class="text-center"><i class="fas fa-angle-double-right sidebar-icon"></i> Expand menu</span>');
   } else {
@@ -271,20 +256,20 @@ function swapCollapseButton () {
 }
 
 function initMenu() {
-  var sidebarState = localStorage.getItem('oscSidebar');
-   $('#menu ul').hide();
-   $('#menu ul').children('.current').parent().show();
-   $('#menu li a').click(
+  var sidebarState = localStorage.getItem("oscSidebar");
+   $("#menu ul").hide();
+   $("#menu ul").children(".current").parent().show();
+   $("#menu li a").click(
       function() {
          var thisElement = $(this);
          var checkElement = $(this).next();
-         if ((checkElement.is('ul')) && (checkElement.is(':visible'))) {
-            checkElement.slideUp('normal');
+         if ((checkElement.is("ul")) && (checkElement.is(":visible"))) {
+            checkElement.slideUp("normal");
             return false;
          }
-         if ((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
-            $('#menu ul:visible').slideUp('normal');
-            checkElement.slideDown('normal');
+         if ((checkElement.is("ul")) && (!checkElement.is(":visible"))) {
+            $("#menu ul:visible").slideUp("normal");
+            checkElement.slideDown("normal");
             return false;
          }
       }
@@ -319,6 +304,7 @@ function initMenu() {
   }
 }
 </style>
-<?php
+EOD;
+  return $this->listen_injectSiteEnd;
     }
   }
