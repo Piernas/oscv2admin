@@ -65,14 +65,13 @@
       <div id="page-heading" class="card-header">
         <div class="d-flex justify-content-between">
           <div class="col-sm-8 pageHeading"><?= $title ?></div>
-          <div class="col-sm-4 pageHeading  text-right"><?= tep_draw_button(IMAGE_SAVE, 'fa fa-floppy-o') . tep_draw_button(IMAGE_CANCEL, 'fa fa-times', tep_href_link('categories.php', 'cPath=' . $cPath . (isset($_GET['pID']) ? '&pID=' . $_GET['pID'] : ''))); ?></div>
+          <div class="col-sm-4 pageHeading  text-right"><?= tep_draw_button(IMAGE_SAVE, 'fas fa-save') . tep_draw_button(IMAGE_CANCEL, 'fas fa-times', tep_href_link('categories.php', 'cPath=' . $cPath . (isset($_GET['pID']) ? '&pID=' . $_GET['pID'] : '')),null,null,'btn-info btn-sm ml-2'); ?></div>
         </div>
       </div>
       <div id="tabs-heading" class="card-header">
 
-      <ul id="productTabsMain" class="nav nav-tabs">
+      <ul id="productTabsMain" class="nav nav-tabs card-header-tabs">
         <li class="nav-item"><a class="nav-link active" data-target="#section_general_content" data-toggle="tab"><?= SECTION_HEADING_GENERAL ?></a></li>
-        <li class="nav-item"><a class="nav-link" data-target="#section_seo_content" data-toggle="tab"><?= SECTION_HEADING_SEO ?></a></li>
         <li class="nav-item"><a class="nav-link" data-target="#section_data_content" data-toggle="tab"><?= SECTION_HEADING_DATA ?></a></li>
         <li class="nav-item"><a class="nav-link" data-target="#section_images_content" data-toggle="tab"><?= SECTION_HEADING_IMAGES ?></a></li>
       </ul>
@@ -107,33 +106,20 @@
       }
 ?>
       <div class="row">
-        <div class="col-md-6 col-lg-4">
+        <div class="col-md-6">
           <label><?= TEXT_PRODUCTS_NAME ?></label>
           <div class="form-group">
             <div class="input-group input-group-sm">
-              
               <?= $language_identifier . tep_draw_input_field('products_name[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : $product->description[$languages[$i]['id']]['products_name']), 'required'); ?>
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-lg-4">
-          <label><?= TEXT_PRODUCTS_SEO_TITLE ?></label>
-          <div class="form-group">
-            <div class="input-group input-group-sm">
-              <div class="input-group-prepend"><span class="input-group-text"><?= $languages[$i]['code'] ?></span></div>
-              <?= tep_draw_input_field('products_seo_title[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' :$product->description[$languages[$i]['id']]['products_seo_title'])) ?>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-4">
-          <label><?= TEXT_PRODUCTS_SEO_KEYWORDS ?></label>
-          <div class="form-group">
-            <div class="input-group input-group-sm">
-              <div class="input-group-prepend"><span class="input-group-text"><?= $languages[$i]['code'] ?></span></div>
-              <?= tep_draw_input_field('products_url[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : stripslashes($product->description[$languages[$i]['id']]['products_url']))); ?>
-            </div>
-          </div>
-        </div>
+        <div class="col-md-6">
+
+      <div class="form-group">
+        <label><?= TEXT_PRODUCTS_URL . '(' . $languages[$i]['name'] . ')' . ' <small>' . TEXT_PRODUCTS_URL_WITHOUT_HTTP . '</small>' ?></label><?= tep_draw_input_field('products_url[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : stripslashes($product->description[$languages[$i]['id']]['products_url']))); ?>
+      </div>
+      </div>
       </div>
 <?php
     }
@@ -151,26 +137,61 @@
     }
 ?>
 
-                </div>
+    </div>
 
+    <div class="row">
 
 <?php
 
     for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 
 ?>
-      
-      <div class="form-group">
-        <label><?= TEXT_PRODUCTS_URL . '(' . $languages[$i]['name'] . ')' . ' <small>' . TEXT_PRODUCTS_URL_WITHOUT_HTTP . '</small>' ?></label><?= tep_draw_input_field('products_url[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : stripslashes($product->description[$languages[$i]['id']]['products_url']))); ?>
-      </div>
+        <div class="col-md-6">
+          <label><?= TEXT_PRODUCTS_SEO_TITLE ?></label>
+          <div class="form-group">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend"><span class="input-group-text"><?= $languages[$i]['code'] ?></span></div>
+              <?= tep_draw_input_field('products_seo_title[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' :$product->description[$languages[$i]['id']]['products_seo_title'])) ?>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label><?= TEXT_PRODUCTS_SEO_KEYWORDS ?></label>
+          <div class="form-group">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend"><span class="input-group-text"><?= $languages[$i]['code'] ?></span></div>
+              <?= tep_draw_input_field('products_url[' . $languages[$i]['id'] . ']', (empty($product->products_id) ? '' : stripslashes($product->description[$languages[$i]['id']]['products_url']))); ?>
+            </div>
+          </div>
+        </div>
 <?php
     }
 ?>
+    </div>
+    <div class="row">
+
+<?php
+
+    for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
+
+?>
+        <div class="col-md-6">
+
+                      <div class="form-group">
+                        <label><?= TEXT_PRODUCTS_SEO_DESCRIPTION ?> <i class="fa fa-info-circle fa-lg text-info" title="<?= TEXT_PRODUCTS_SEO_DESCRIPTION_TOOLTIP?>" data-toggle="tooltip"></i></label><?= tep_draw_textarea_field('products_seo_description[' . $languages[$i]['id'] . ']', null, '70', '10', (empty($product->products_id) ? '' : $product->description[$languages[$i]['id']]['products_seo_description'])) ?>
+                      </div>
+                      </div>
+<?php
+    }
+?>
+      </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+<?php
+/*
 
         <div id="section_seo_content" class="tab-pane fade" role="tabpanel">
           <div class="card">
@@ -188,6 +209,7 @@
 
                 <div class="tab-content">
 <?php
+
     for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 ?>
 
@@ -210,7 +232,8 @@
             </div>
           </div>
         </div>
-
+*/
+?>
 <script>
 var tax_rates = new Array();
 <?php
