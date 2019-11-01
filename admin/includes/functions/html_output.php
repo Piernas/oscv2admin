@@ -170,7 +170,7 @@
 
 ////
 // Output a form input field
-  function tep_draw_input_field($name, $value = '', $parameters = '', $type = 'text', $reinsert_value = true, $class = 'class="form-control form-control-sm"') {
+  function tep_draw_input_field($name, $value = '', $parameters = '', $type = 'text', $reinsert_value = true, $class = 'class="form-control"') {
     $field = '<input type="' . tep_output_string($type) . '" name="' . tep_output_string($name) . '"';
 
     if ( ($reinsert_value == true) && ( (isset($_GET[$name]) && is_string($_GET[$name])) || (isset($_POST[$name]) && is_string($_POST[$name])) ) ) {
@@ -304,7 +304,7 @@
 
     if (tep_not_null($parameters)) $field .= ' ' . $parameters;
 
-    (strpos($parameters , "class") !== false ) ? $field .= ">" : $field .= 'class="form-control form-control-sm">';
+    (strpos($parameters , "class") !== false ) ? $field .= ">" : $field .= 'class="form-control">';
 
 
     if (empty($default) && ( (isset($_GET[$name]) && is_string($_GET[$name])) || (isset($_POST[$name]) && is_string($_POST[$name])) ) ) {
@@ -374,7 +374,7 @@
 
     $button .= ' class="btn ';
 
-    $button .= (isset($style)) ? $style : 'btn-info btn-sm';
+    $button .= (isset($style)) ? $style : 'btn-default';
 
     $button .= '">';
 

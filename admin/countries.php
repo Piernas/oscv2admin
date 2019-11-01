@@ -185,7 +185,7 @@
 
 ?>
               <tr class="clickable">
-                <td><?php echo $country['countries_name']; ?></td>
+                <td><i class="flag-icon flag-icon-<?= strtolower($country['countries_iso_code_2']) ?> mr-2"></i><?php echo $country['countries_name']; ?></td>
                 <td align="center"><?php echo $country['countries_iso_code_2']; ?></td>
                 <td align="center"><?php echo $country['countries_iso_code_3']; ?></td>
                 <td align="center"><?php echo $country['address_format_id']; ?></td>
@@ -216,6 +216,9 @@
   $modal->button_delete = true;
   $modal->button_cancel = true;
   $modal->output();
+
+  $stylesheet = '<link rel="stylesheet" href="' . tep_catalog_href_link ( 'ext/flag-icon-css/css/flag-icon.min.css') . '">' . PHP_EOL;
+  $oscTemplate->addBlock($stylesheet, 'admin_footer_scripts');
 
 ?>
 <script>
