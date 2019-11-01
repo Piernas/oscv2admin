@@ -26,7 +26,7 @@
       array(
         'code' => 'geo_zones.php',
         'title' => BOX_TAXES_GEO_ZONES,
-        'link' => tep_href_link('geo_zones.php')
+        'link' => tep_href_link('tax_zones.php')
       ),
       array(
         'code' => 'tax_classes.php',
